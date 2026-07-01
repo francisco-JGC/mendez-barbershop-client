@@ -28,8 +28,6 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
   ],
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },
-    { label: 'Nueva venta', path: '/barber/sales', icon: ShoppingCart },
-    { label: 'Registro de ventas', path: '/barber/sales-record', icon: Receipt },
   ],
   [Role.SUPER_ADMIN]: [],
 };

@@ -18,7 +18,7 @@ export interface TicketItem {
 export interface Ticket {
   id: string;
   barbershopId: string;
-  barberId: string;
+  barberId: string | null;
   stationId: string | null;
   total: string;
   items: TicketItem[];

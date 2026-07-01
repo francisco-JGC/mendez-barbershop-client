@@ -13,7 +13,7 @@ export interface ReceiptInput {
   barbershopName: string;
   ticketId: string;
   createdAt: string;
-  barberName: string;
+  barberName?: string | null;
   stationLabel?: string | null;
   lines: ReceiptLineItem[];
   total: string;
@@ -33,8 +33,11 @@ export function buildReceipt(input: ReceiptInput): Uint8Array {
     .newline()
     .align(Align.LEFT)
     .line(`Ticket: ${input.ticketId.slice(0, 8).toUpperCase()}`)
-    .line(`Fecha: ${formatDateTime(input.createdAt)}`)
-    .line(`Barbero: ${input.barberName}`);
+    .line(`Fecha: ${formatDateTime(input.createdAt)}`);
+
+  if (input.barberName) {
+    receipt.line(`Barbero: ${input.barberName}`);
+  }
 
   if (input.stationLabel) {
     receipt.line(`Silla: ${input.stationLabel}`);

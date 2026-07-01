@@ -1,5 +1,6 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/layout/protected-route';
+import { HomeRedirect } from '@/components/layout/home-redirect';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoginPage } from '@/pages/login-page';
 import { AdminDashboardPage } from '@/pages/admin-dashboard-page';
@@ -37,13 +38,11 @@ export function App() {
       <Route element={<ProtectedRoute allowedRoles={[Role.BARBER]} />}>
         <Route element={<AppLayout />}>
           <Route path="/barber" element={<BarberDashboardPage />} />
-          <Route path="/barber/sales" element={<SalesPage />} />
-          <Route path="/barber/sales-record" element={<SalesRecordPage />} />
         </Route>
       </Route>
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<HomeRedirect />} />
+      <Route path="*" element={<HomeRedirect />} />
     </Routes>
   );
 }

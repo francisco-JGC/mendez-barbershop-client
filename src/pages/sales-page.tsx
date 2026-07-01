@@ -35,7 +35,8 @@ export function SalesPage() {
   const barbers = (users ?? []).filter((u) => u.role === Role.BARBER && u.isActive);
   const cartQuantities = new Map(cart.lines.map((l) => [lineKey(l), l.quantity]));
 
-  function resolveBarberName(id: string): string {
+  function resolveBarberName(id: string | null): string | null {
+    if (!id) return null;
     const found = barbers.find((b) => b.id === id);
     if (found) return found.name;
     if (user?.userId === id) return user.email;
@@ -67,7 +68,7 @@ export function SalesPage() {
   async function handleSubmit() {
     try {
       const ticket = await createTicketMutation.mutateAsync({
-        barberId: isAdmin ? barberId : undefined,
+        barberId: isAdmin && barberId ? barberId : undefined,
         items: cart.lines.map((l) => ({
           itemType: l.itemType,
           itemId: l.itemId,

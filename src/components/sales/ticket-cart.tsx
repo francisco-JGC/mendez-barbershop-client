@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/format';
 import { lineKey } from '@/lib/ticket-cart';
-import type { CartLine } from '@/types/ticket';
+import { TicketItemType, type CartLine } from '@/types/ticket';
 import type { UserSummary } from '@/types/user';
 
 export function TicketCart({
@@ -39,7 +39,9 @@ export function TicketCart({
   isSubmitting: boolean;
 }) {
   const total = lines.reduce((sum, line) => sum + Number(line.unitPrice) * line.quantity, 0);
-  const canSubmit = lines.length > 0 && (!showBarberSelect || !!barberId);
+  const hasService = lines.some((line) => line.itemType === TicketItemType.SERVICE);
+  const barberRequired = showBarberSelect && hasService;
+  const canSubmit = lines.length > 0 && (!barberRequired || !!barberId);
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -107,10 +109,18 @@ export function TicketCart({
       <div className="space-y-3 border-t pt-4">
         {showBarberSelect && (
           <div className="space-y-1.5">
-            <Label htmlFor="ticket-barber">Barbero</Label>
+            <Label htmlFor="ticket-barber">
+              Barbero{!barberRequired && ' (opcional)'}
+            </Label>
             <Select value={barberId} onValueChange={onBarberChange}>
               <SelectTrigger id="ticket-barber" className="w-full">
-                <SelectValue placeholder="Selecciona un barbero" />
+                <SelectValue
+                  placeholder={
+                    barberRequired
+                      ? 'Selecciona un barbero'
+                      : 'Sin barbero (venta de producto)'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {barbers.map((barber) => (

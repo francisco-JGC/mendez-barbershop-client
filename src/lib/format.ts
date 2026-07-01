@@ -1,6 +1,6 @@
-const currencyFormatter = new Intl.NumberFormat('es-MX', {
+const currencyFormatter = new Intl.NumberFormat('es-NI', {
   style: 'currency',
-  currency: 'MXN',
+  currency: 'NIO',
 });
 
 export function formatCurrency(value: string | number): string {
@@ -8,7 +8,7 @@ export function formatCurrency(value: string | number): string {
 }
 
 export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('es-MX', {
+  return new Date(iso).toLocaleString('es-NI', {
     dateStyle: 'short',
     timeStyle: 'short',
   });

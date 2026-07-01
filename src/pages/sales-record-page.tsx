@@ -48,7 +48,8 @@ export function SalesRecordPage() {
 
   const totalPages = data ? Math.max(Math.ceil(data.total / PAGE_SIZE), 1) : 1;
 
-  function barberName(barberId: string): string {
+  function barberName(barberId: string | null): string {
+    if (!barberId) return 'Sin barbero';
     const found = (users ?? []).find((u) => u.id === barberId);
     if (found) return found.name;
     if (user?.userId === barberId) return user.email;
@@ -73,7 +74,7 @@ export function SalesRecordPage() {
         barbershopName: BARBERSHOP_DISPLAY_NAME,
         ticketId: ticket.id,
         createdAt: ticket.createdAt,
-        barberName: barberName(ticket.barberId),
+        barberName: ticket.barberId ? barberName(ticket.barberId) : null,
         stationLabel: stationLabel(ticket.stationId),
         lines: ticket.items.map((item) => ({
           name: resolveItemName(item.itemType, item.itemId),

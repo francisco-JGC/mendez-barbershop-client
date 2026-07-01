@@ -10,13 +10,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useLogin } from '@/hooks/use-login';
 import { getLoginErrorMessage } from '@/lib/errors';
 import { BARBERSHOP_DISPLAY_NAME, DEFAULT_TENANT_CODE } from '@/lib/constants';
-import { Role } from '@/types/auth';
-
-function roleHomePath(role: Role): string {
-  if (role === Role.ADMIN) return '/admin';
-  if (role === Role.BARBER) return '/barber';
-  return '/super-admin';
-}
+import { roleHomePath } from '@/lib/routes';
 
 export function LoginPage() {
   const { user } = useAuth();
