@@ -1,4 +1,4 @@
-import { Plus, Users as UsersIcon } from 'lucide-react';
+import { KeyRound, Pencil, Plus, Users as UsersIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Card,
@@ -24,6 +24,7 @@ import { useUsers, useSetUserActive } from '@/hooks/use-users';
 import { useAuth } from '@/hooks/use-auth';
 import { getApiErrorMessage } from '@/lib/errors';
 import { UserFormDialog } from '@/components/users/user-form-dialog';
+import { ResetPasswordDialog } from '@/components/users/reset-password-dialog';
 import { PageHeader } from '@/components/layout/page-header';
 import { Role } from '@/types/auth';
 
@@ -97,6 +98,7 @@ export function UsersPage() {
                   <TableHead>Correo</TableHead>
                   <TableHead>Rol</TableHead>
                   <TableHead className="text-right">Activo</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -117,6 +119,26 @@ export function UsersPage() {
                         }
                         onCheckedChange={(checked) => handleToggleActive(user.id, checked)}
                       />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <UserFormDialog
+                          user={user}
+                          trigger={
+                            <Button variant="ghost" size="icon" aria-label="Editar usuario">
+                              <Pencil className="size-4" />
+                            </Button>
+                          }
+                        />
+                        <ResetPasswordDialog
+                          user={user}
+                          trigger={
+                            <Button variant="ghost" size="icon" aria-label="Restablecer contraseña">
+                              <KeyRound className="size-4" />
+                            </Button>
+                          }
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

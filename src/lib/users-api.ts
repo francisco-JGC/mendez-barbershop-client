@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { CreateUserInput, UserSummary } from '@/types/user';
+import type { CreateUserInput, UpdateUserInput, UserSummary } from '@/types/user';
 
 export async function fetchUsers(): Promise<UserSummary[]> {
   const { data } = await api.get<UserSummary[]>('/users');
@@ -17,6 +17,24 @@ export async function setUserActive(
 ): Promise<UserSummary> {
   const { data } = await api.patch<UserSummary>(`/users/${id}/active`, {
     isActive,
+  });
+  return data;
+}
+
+export async function updateUser(
+  id: string,
+  input: UpdateUserInput,
+): Promise<UserSummary> {
+  const { data } = await api.patch<UserSummary>(`/users/${id}`, input);
+  return data;
+}
+
+export async function resetUserPassword(
+  id: string,
+  password: string,
+): Promise<UserSummary> {
+  const { data } = await api.patch<UserSummary>(`/users/${id}/password`, {
+    password,
   });
   return data;
 }
