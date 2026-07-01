@@ -1,10 +1,19 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Printer, Receipt } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -30,23 +39,45 @@ import { Role } from '@/types/auth';
 import { TicketItemType, type Ticket } from '@/types/ticket';
 
 const PAGE_SIZE = 20;
+const ALL_BARBERS = 'all';
 
 export function SalesRecordPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === Role.ADMIN;
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const barberIdParam = searchParams.get('barberId') ?? '';
+
   const [page, setPage] = useState(1);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [reprintingId, setReprintingId] = useState<string | null>(null);
 
-  const { data, isLoading, isError } = useTickets(page, PAGE_SIZE);
+  const { data, isLoading, isError } = useTickets(
+    page,
+    PAGE_SIZE,
+    barberIdParam || undefined,
+  );
   const { data: users } = useUsers(isAdmin);
   const { data: stations } = useStations();
   const { data: services } = useServices();
   const { data: products } = useProducts();
   const printReceipt = usePrinterStore((s) => s.print);
 
+  const barbers = (users ?? []).filter((u) => u.role === Role.BARBER);
+  const filteredBarberName = barberIdParam
+    ? barbers.find((b) => b.id === barberIdParam)?.name
+    : null;
   const totalPages = data ? Math.max(Math.ceil(data.total / PAGE_SIZE), 1) : 1;
+
+  function handleBarberChange(value: string) {
+    setPage(1);
+    if (value === ALL_BARBERS) {
+      searchParams.delete('barberId');
+    } else {
+      searchParams.set('barberId', value);
+    }
+    setSearchParams(searchParams, { replace: true });
+  }
 
   function barberName(barberId: string | null): string {
     if (!barberId) return 'Sin barbero';
@@ -103,7 +134,11 @@ export function SalesRecordPage() {
     <div className="space-y-6">
       <PageHeader
         title="Registro de ventas"
-        description="Historial de tickets con la posibilidad de reimprimirlos."
+        description={
+          filteredBarberName
+            ? `Historial de tickets de ${filteredBarberName}.`
+            : 'Historial de tickets con la posibilidad de reimprimirlos.'
+        }
       />
 
       {isError && (
@@ -113,6 +148,27 @@ export function SalesRecordPage() {
             Intenta recargar la página en unos segundos.
           </AlertDescription>
         </Alert>
+      )}
+
+      {isAdmin && barbers.length > 0 && (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Label htmlFor="barber-filter" className="text-sm text-muted-foreground">
+            Barbero:
+          </Label>
+          <Select value={barberIdParam || ALL_BARBERS} onValueChange={handleBarberChange}>
+            <SelectTrigger id="barber-filter" className="w-full sm:w-64">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_BARBERS}>Todos los barberos</SelectItem>
+              {barbers.map((barber) => (
+                <SelectItem key={barber.id} value={barber.id}>
+                  {barber.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       )}
 
       <Card>
@@ -193,7 +249,11 @@ export function SalesRecordPage() {
                 <Receipt className="size-6" />
               </span>
               <div>
-                <p className="text-sm font-medium">Todavía no hay ventas registradas</p>
+                <p className="text-sm font-medium">
+                  {filteredBarberName
+                    ? `${filteredBarberName} todavía no tiene ventas registradas`
+                    : 'Todavía no hay ventas registradas'}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Los tickets aparecerán aquí conforme se registren ventas.
                 </p>

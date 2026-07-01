@@ -9,9 +9,14 @@ export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
 export async function listTickets(
   page: number,
   limit: number,
+  barberId?: string,
 ): Promise<PaginatedTickets> {
   const { data } = await api.get<PaginatedTickets>('/tickets', {
-    params: { page, limit },
+    params: {
+      page,
+      limit,
+      ...(barberId ? { barberId } : {}),
+    },
   });
   return data;
 }

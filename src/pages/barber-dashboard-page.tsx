@@ -1,8 +1,21 @@
 import { useState } from 'react';
-import { Armchair, Banknote, HandCoins, Scissors, TrendingUp } from 'lucide-react';
+import {
+  Armchair,
+  Banknote,
+  HandCoins,
+  ListChecks,
+  Scissors,
+  TrendingUp,
+} from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { PeriodTabs } from '@/components/dashboard/period-tabs';
@@ -12,11 +25,11 @@ import { useAuth } from '@/hooks/use-auth';
 import { formatCurrency } from '@/lib/format';
 import type { DashboardPeriod } from '@/types/dashboard';
 
-const CUTS_LABEL: Record<DashboardPeriod, string> = {
-  day: 'Cortes hoy',
-  yesterday: 'Cortes ayer',
-  week: 'Cortes esta semana',
-  month: 'Cortes este mes',
+const SERVICES_LABEL: Record<DashboardPeriod, string> = {
+  day: 'Servicios realizados hoy',
+  yesterday: 'Servicios realizados ayer',
+  week: 'Servicios realizados esta semana',
+  month: 'Servicios realizados este mes',
 };
 
 const EARNINGS_LABEL: Record<DashboardPeriod, string> = {
@@ -75,6 +88,7 @@ export function BarberDashboardPage() {
               <Skeleton key={i} className="h-24 w-full" />
             ))}
           </div>
+          <Skeleton className="h-48 w-full" />
         </div>
       ) : data ? (
         <div className="space-y-4">
@@ -103,7 +117,7 @@ export function BarberDashboardPage() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
-              label={CUTS_LABEL[period]}
+              label={SERVICES_LABEL[period]}
               value={String(data.cutsCount)}
               icon={Scissors}
             />
@@ -113,16 +127,51 @@ export function BarberDashboardPage() {
               icon={Banknote}
             />
             <StatCard
-              label="Promedio por corte"
+              label="Promedio por servicio"
               value={formatCurrency(averagePerCut)}
               icon={TrendingUp}
               hint={
                 data.cutsCount > 0
-                  ? `${data.cutsCount} corte${data.cutsCount === 1 ? '' : 's'} en total`
-                  : 'Sin cortes registrados'
+                  ? `${data.cutsCount} servicio${data.cutsCount === 1 ? '' : 's'} en total`
+                  : 'Sin servicios registrados'
               }
             />
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ListChecks className="size-4 text-primary" />
+                Desglose por servicio
+              </CardTitle>
+              <CardDescription>
+                Cantidad de veces que realizaste cada tipo de servicio.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {data.serviceBreakdown.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Aún no has realizado servicios en este periodo.
+                </p>
+              ) : (
+                <ul className="divide-y">
+                  {data.serviceBreakdown.map((entry) => (
+                    <li
+                      key={entry.serviceId}
+                      className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+                    >
+                      <span className="truncate text-sm font-medium">
+                        {entry.serviceName}
+                      </span>
+                      <Badge variant="secondary">
+                        {entry.count} {entry.count === 1 ? 'vez' : 'veces'}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
         </div>
       ) : null}
     </div>

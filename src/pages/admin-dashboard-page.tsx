@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   Banknote,
+  ChevronRight,
   Crown,
   HandCoins,
+  ListChecks,
   Package,
   Scissors,
-  TrendingUp,
 } from 'lucide-react';
 import {
   Card,
@@ -27,6 +29,7 @@ import { cn } from '@/lib/utils';
 import type { DashboardPeriod } from '@/types/dashboard';
 
 export function AdminDashboardPage() {
+  const navigate = useNavigate();
   const [period, setPeriod] = useState<DashboardPeriod>('day');
   const { data, isLoading, isError } = useAdminDashboard(period);
 
@@ -90,35 +93,49 @@ export function AdminDashboardPage() {
                 {data.barberRanking.length === 0 ? (
                   <EmptyState message="Todavía no hay ventas registradas." />
                 ) : (
-                  <ul className="space-y-3">
+                  <ul className="-mx-2 space-y-0.5">
                     {data.barberRanking.map((entry, index) => (
-                      <li
-                        key={entry.barberId}
-                        className="flex items-center justify-between gap-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={cn(
-                              'flex size-7 items-center justify-center rounded-full text-xs font-semibold',
-                              index === 0
-                                ? 'bg-gradient-to-br from-primary to-primary/70 text-primary-foreground'
-                                : 'bg-muted text-muted-foreground',
-                            )}
-                          >
-                            {index + 1}
-                          </span>
-                          <span className="text-sm font-medium">
-                            {entry.barberName}
-                          </span>
-                        </div>
-                        <div className="flex flex-col items-end">
-                          <span className="text-sm font-semibold">
-                            {formatCurrency(entry.revenue)}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            Comisión {formatCurrency(entry.commission)}
-                          </span>
-                        </div>
+                      <li key={entry.barberId}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(`/admin/sales-record?barberId=${entry.barberId}`)
+                          }
+                          className="group flex w-full items-center justify-between gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/60"
+                        >
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span
+                              className={cn(
+                                'flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+                                index === 0
+                                  ? 'bg-gradient-to-br from-primary to-primary/70 text-primary-foreground'
+                                  : 'bg-muted text-muted-foreground',
+                              )}
+                            >
+                              {index + 1}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-medium">
+                                {entry.barberName}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {entry.cutsCount} servicio
+                                {entry.cutsCount === 1 ? '' : 's'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex flex-col items-end">
+                              <span className="text-sm font-semibold">
+                                {formatCurrency(entry.revenue)}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Comisión {formatCurrency(entry.commission)}
+                              </span>
+                            </div>
+                            <ChevronRight className="size-4 text-muted-foreground/60 transition-colors group-hover:text-foreground" />
+                          </div>
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -129,26 +146,32 @@ export function AdminDashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <TrendingUp className="size-4 text-primary" />
-                  Servicio más solicitado
+                  <ListChecks className="size-4 text-primary" />
+                  Desglose por servicio
                 </CardTitle>
                 <CardDescription>
-                  El corte o servicio favorito de tus clientes.
+                  Cuántas veces se realizó cada servicio en el periodo.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {data.topService ? (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      {data.topService.serviceName}
-                    </span>
-                    <Badge variant="secondary">
-                      {data.topService.count}{' '}
-                      {data.topService.count === 1 ? 'vez' : 'veces'}
-                    </Badge>
-                  </div>
-                ) : (
+                {data.serviceBreakdown.length === 0 ? (
                   <EmptyState message="Aún no hay servicios registrados." />
+                ) : (
+                  <ul className="divide-y">
+                    {data.serviceBreakdown.map((entry) => (
+                      <li
+                        key={entry.serviceId}
+                        className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+                      >
+                        <span className="truncate text-sm font-medium">
+                          {entry.serviceName}
+                        </span>
+                        <Badge variant="secondary">
+                          {entry.count} {entry.count === 1 ? 'vez' : 'veces'}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </CardContent>
             </Card>

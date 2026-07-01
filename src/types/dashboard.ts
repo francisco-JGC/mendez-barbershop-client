@@ -3,11 +3,12 @@ export type DashboardPeriod = 'day' | 'yesterday' | 'week' | 'month';
 export interface BarberRankingEntry {
   barberId: string;
   barberName: string;
+  cutsCount: number;
   revenue: string;
   commission: string;
 }
 
-export interface TopServiceEntry {
+export interface ServiceBreakdownEntry {
   serviceId: string;
   serviceName: string;
   count: number;
@@ -26,7 +27,7 @@ export interface AdminDashboardSummary {
   totalRevenue: string;
   totalCommissions: string;
   barberRanking: BarberRankingEntry[];
-  topService: TopServiceEntry | null;
+  serviceBreakdown: ServiceBreakdownEntry[];
   lowStockProducts: LowStockProductEntry[];
 }
 
@@ -35,4 +36,5 @@ export interface BarberDashboardSummary {
   totalRevenue: string;
   commission: string;
   stationNumber: number | null;
+  serviceBreakdown: ServiceBreakdownEntry[];
 }
