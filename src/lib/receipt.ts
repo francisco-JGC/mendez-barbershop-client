@@ -1,5 +1,5 @@
 import { Align, ReceiptBuilder, twoColumns } from '@/lib/escpos';
-import { formatCurrency } from '@/lib/format';
+import { formatCurrency, formatDateTime } from '@/lib/format';
 
 const DEFAULT_WIDTH = 32; // characters per line on a standard 58mm thermal printer
 
@@ -20,13 +20,6 @@ export interface ReceiptInput {
   width?: number;
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString('es-MX', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
-}
-
 export function buildReceipt(input: ReceiptInput): Uint8Array {
   const width = input.width ?? DEFAULT_WIDTH;
 
@@ -40,7 +33,7 @@ export function buildReceipt(input: ReceiptInput): Uint8Array {
     .newline()
     .align(Align.LEFT)
     .line(`Ticket: ${input.ticketId.slice(0, 8).toUpperCase()}`)
-    .line(`Fecha: ${formatDate(input.createdAt)}`)
+    .line(`Fecha: ${formatDateTime(input.createdAt)}`)
     .line(`Barbero: ${input.barberName}`);
 
   if (input.stationLabel) {

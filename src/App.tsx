@@ -7,6 +7,7 @@ import { ServicesPage } from '@/pages/services-page';
 import { ProductsPage } from '@/pages/products-page';
 import { StationsPage } from '@/pages/stations-page';
 import { SalesPage } from '@/pages/sales-page';
+import { SalesRecordPage } from '@/pages/sales-record-page';
 import { UsersPage } from '@/pages/users-page';
 import { BarberDashboardPage } from '@/pages/barber-dashboard-page';
 import { SuperAdminPlaceholderPage } from '@/pages/super-admin-placeholder-page';
@@ -28,6 +29,7 @@ export function App() {
           <Route path="/admin/products" element={<ProductsPage />} />
           <Route path="/admin/stations" element={<StationsPage />} />
           <Route path="/admin/sales" element={<SalesPage />} />
+          <Route path="/admin/sales-record" element={<SalesRecordPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
         </Route>
       </Route>
@@ -36,6 +38,7 @@ export function App() {
         <Route element={<AppLayout />}>
           <Route path="/barber" element={<BarberDashboardPage />} />
           <Route path="/barber/sales" element={<SalesPage />} />
+          <Route path="/barber/sales-record" element={<SalesRecordPage />} />
         </Route>
       </Route>
 

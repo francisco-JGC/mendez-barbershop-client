@@ -36,6 +36,11 @@ export interface CreateTicketInput {
   items: CreateTicketItemInput[];
 }
 
+export interface PaginatedTickets {
+  items: Ticket[];
+  total: number;
+}
+
 export interface CartLine {
   itemType: TicketItemType;
   itemId: string;

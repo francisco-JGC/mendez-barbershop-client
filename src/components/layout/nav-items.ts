@@ -2,6 +2,7 @@ import {
   Armchair,
   LayoutDashboard,
   Package,
+  Receipt,
   Scissors,
   ShoppingCart,
   Users,
@@ -19,6 +20,7 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
   [Role.ADMIN]: [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { label: 'Nueva venta', path: '/admin/sales', icon: ShoppingCart },
+    { label: 'Registro de ventas', path: '/admin/sales-record', icon: Receipt },
     { label: 'Servicios', path: '/admin/services', icon: Scissors },
     { label: 'Productos', path: '/admin/products', icon: Package },
     { label: 'Sillas', path: '/admin/stations', icon: Armchair },
@@ -27,6 +29,7 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },
     { label: 'Nueva venta', path: '/barber/sales', icon: ShoppingCart },
+    { label: 'Registro de ventas', path: '/barber/sales-record', icon: Receipt },
   ],
   [Role.SUPER_ADMIN]: [],
 };

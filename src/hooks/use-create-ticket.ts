@@ -9,6 +9,7 @@ export function useCreateTicket() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       void queryClient.invalidateQueries({ queryKey: ['products'] });
+      void queryClient.invalidateQueries({ queryKey: ['tickets'] });
     },
   });
 }
