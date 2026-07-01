@@ -7,6 +7,7 @@ import { ServicesPage } from '@/pages/services-page';
 import { ProductsPage } from '@/pages/products-page';
 import { StationsPage } from '@/pages/stations-page';
 import { SalesPage } from '@/pages/sales-page';
+import { UsersPage } from '@/pages/users-page';
 import { BarberDashboardPage } from '@/pages/barber-dashboard-page';
 import { SuperAdminPlaceholderPage } from '@/pages/super-admin-placeholder-page';
 import { Role } from '@/types/auth';
@@ -27,6 +28,7 @@ export function App() {
           <Route path="/admin/products" element={<ProductsPage />} />
           <Route path="/admin/stations" element={<StationsPage />} />
           <Route path="/admin/sales" element={<SalesPage />} />
+          <Route path="/admin/users" element={<UsersPage />} />
         </Route>
       </Route>
 

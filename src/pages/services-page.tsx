@@ -21,28 +21,27 @@ import {
 import { useServices } from '@/hooks/use-services';
 import { formatCurrency } from '@/lib/format';
 import { ServiceFormDialog } from '@/components/catalog/service-form-dialog';
+import { PageHeader } from '@/components/layout/page-header';
 
 export function ServicesPage() {
   const { data, isLoading, isError } = useServices();
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Servicios</h1>
-          <p className="text-sm text-muted-foreground">
-            Cortes y servicios que ofrece tu barbería.
-          </p>
-        </div>
-        <ServiceFormDialog
-          trigger={
-            <Button>
-              <Plus className="size-4" />
-              Nuevo servicio
-            </Button>
-          }
-        />
-      </div>
+      <PageHeader
+        title="Servicios"
+        description="Cortes y servicios que ofrece tu barbería."
+        action={
+          <ServiceFormDialog
+            trigger={
+              <Button>
+                <Plus className="size-4" />
+                Nuevo servicio
+              </Button>
+            }
+          />
+        }
+      />
 
       {isError && (
         <Alert variant="destructive">

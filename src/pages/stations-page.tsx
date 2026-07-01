@@ -6,6 +6,7 @@ import { useStations } from '@/hooks/use-stations';
 import { useUsers } from '@/hooks/use-users';
 import { CreateStationDialog } from '@/components/stations/create-station-dialog';
 import { StationCard } from '@/components/stations/station-card';
+import { PageHeader } from '@/components/layout/page-header';
 import { Role } from '@/types/auth';
 
 export function StationsPage() {
@@ -20,22 +21,20 @@ export function StationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Sillas</h1>
-          <p className="text-sm text-muted-foreground">
-            Estaciones de trabajo y los barberos asignados.
-          </p>
-        </div>
-        <CreateStationDialog
-          trigger={
-            <Button>
-              <Plus className="size-4" />
-              Nueva silla
-            </Button>
-          }
-        />
-      </div>
+      <PageHeader
+        title="Sillas"
+        description="Estaciones de trabajo y los barberos asignados."
+        action={
+          <CreateStationDialog
+            trigger={
+              <Button>
+                <Plus className="size-4" />
+                Nueva silla
+              </Button>
+            }
+          />
+        }
+      />
 
       {isStationsError && (
         <Alert variant="destructive">

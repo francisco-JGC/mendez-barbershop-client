@@ -4,6 +4,7 @@ import {
   Package,
   Scissors,
   ShoppingCart,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { Role } from '@/types/auth';
@@ -21,6 +22,7 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
     { label: 'Servicios', path: '/admin/services', icon: Scissors },
     { label: 'Productos', path: '/admin/products', icon: Package },
     { label: 'Sillas', path: '/admin/stations', icon: Armchair },
+    { label: 'Usuarios', path: '/admin/users', icon: Users },
   ],
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { navItemsByRole, roleLabels } from '@/components/layout/nav-items';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
@@ -55,14 +56,14 @@ export function AppLayout() {
             <Menu className="size-5" />
           </Button>
 
-          <div className="hidden text-sm text-muted-foreground lg:block">
+          <Badge variant="secondary" className="hidden lg:inline-flex">
             {roleLabels[user.role]}
-          </div>
+          </Badge>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="ml-auto flex items-center gap-2 px-2">
-                <Avatar className="size-8">
+                <Avatar className="size-8 ring-2 ring-primary/20">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                     {initialsFromEmail(user.email)}
                   </AvatarFallback>

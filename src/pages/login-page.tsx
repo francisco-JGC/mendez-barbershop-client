@@ -44,15 +44,21 @@ export function LoginPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-10 text-sidebar-foreground lg:flex">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_oklch(0.7_0.16_55_/_0.18),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_oklch(0.7_0.16_55_/_0.22),_transparent_55%)]" />
+        <div className="barber-stripes absolute inset-0" />
+        <Scissors className="pointer-events-none absolute -right-16 -bottom-16 size-96 rotate-12 text-sidebar-primary/[0.06]" />
+
         <div className="relative z-10 flex items-center gap-2 text-lg font-semibold">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-md">
             <Scissors className="size-5" />
           </span>
           {BARBERSHOP_DISPLAY_NAME}
         </div>
-        <div className="relative z-10 space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">
+        <div className="relative z-10 space-y-4">
+          <span className="inline-flex items-center rounded-full bg-sidebar-primary/15 px-3 py-1 text-xs font-medium text-sidebar-primary">
+            Panel de gestión
+          </span>
+          <h1 className="text-4xl leading-[1.1] tracking-tight">
             Gestiona tu barbería con estilo.
           </h1>
           <p className="max-w-md text-sm text-sidebar-foreground/70">
@@ -74,7 +80,8 @@ export function LoginPage() {
             <span className="text-lg font-semibold">{BARBERSHOP_DISPLAY_NAME}</span>
           </div>
 
-          <Card className="border-border/60 shadow-lg">
+          <Card className="relative overflow-hidden border-border/60 shadow-xl">
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary to-primary/60" />
             <CardHeader>
               <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
               <CardDescription>

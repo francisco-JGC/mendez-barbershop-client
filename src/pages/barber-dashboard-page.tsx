@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/dashboard/stat-card';
+import { PageHeader } from '@/components/layout/page-header';
 import { useBarberDashboard } from '@/hooks/use-barber-dashboard';
 import { useAuth } from '@/hooks/use-auth';
 import { formatCurrency } from '@/lib/format';
@@ -16,22 +17,18 @@ export function BarberDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Hola, {user?.email.split('@')[0]} 👋
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Este es tu resumen personal.
-          </p>
-        </div>
-        <Tabs value={period} onValueChange={(v) => setPeriod(v as DashboardPeriod)}>
-          <TabsList>
-            <TabsTrigger value="day">Hoy</TabsTrigger>
-            <TabsTrigger value="month">Este mes</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      <PageHeader
+        title={`Hola, ${user?.email.split('@')[0]} 👋`}
+        description="Este es tu resumen personal."
+        action={
+          <Tabs value={period} onValueChange={(v) => setPeriod(v as DashboardPeriod)}>
+            <TabsList>
+              <TabsTrigger value="day">Hoy</TabsTrigger>
+              <TabsTrigger value="month">Este mes</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        }
+      />
 
       {isError && (
         <Alert variant="destructive">

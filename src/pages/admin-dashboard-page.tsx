@@ -19,8 +19,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StatCard } from '@/components/dashboard/stat-card';
+import { PageHeader } from '@/components/layout/page-header';
 import { useAdminDashboard } from '@/hooks/use-admin-dashboard';
 import { formatCurrency } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import type { DashboardPeriod } from '@/types/dashboard';
 
 export function AdminDashboardPage() {
@@ -29,20 +31,18 @@ export function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Rendimiento general de la barbería.
-          </p>
-        </div>
-        <Tabs value={period} onValueChange={(v) => setPeriod(v as DashboardPeriod)}>
-          <TabsList>
-            <TabsTrigger value="day">Hoy</TabsTrigger>
-            <TabsTrigger value="month">Este mes</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Rendimiento general de la barbería."
+        action={
+          <Tabs value={period} onValueChange={(v) => setPeriod(v as DashboardPeriod)}>
+            <TabsList>
+              <TabsTrigger value="day">Hoy</TabsTrigger>
+              <TabsTrigger value="month">Este mes</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        }
+      />
 
       {isError && (
         <Alert variant="destructive">
@@ -98,7 +98,14 @@ export function AdminDashboardPage() {
                         className="flex items-center justify-between gap-3"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="flex size-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                          <span
+                            className={cn(
+                              'flex size-7 items-center justify-center rounded-full text-xs font-semibold',
+                              index === 0
+                                ? 'bg-gradient-to-br from-primary to-primary/70 text-primary-foreground'
+                                : 'bg-muted text-muted-foreground',
+                            )}
+                          >
                             {index + 1}
                           </span>
                           <span className="text-sm font-medium">

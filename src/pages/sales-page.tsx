@@ -14,7 +14,9 @@ import { PrinterStatus } from '@/components/sales/printer-status';
 import { usePrinterStore } from '@/stores/printer-store';
 import { getApiErrorMessage } from '@/lib/errors';
 import { buildReceipt } from '@/lib/receipt';
+import { lineKey } from '@/lib/ticket-cart';
 import { BARBERSHOP_DISPLAY_NAME } from '@/lib/constants';
+import { PageHeader } from '@/components/layout/page-header';
 import { Role } from '@/types/auth';
 
 export function SalesPage() {
@@ -32,6 +34,7 @@ export function SalesPage() {
   const [lastReceipt, setLastReceipt] = useState<Uint8Array | null>(null);
 
   const barbers = (users ?? []).filter((u) => u.role === Role.BARBER && u.isActive);
+  const cartQuantities = new Map(cart.lines.map((l) => [lineKey(l), l.quantity]));
 
   function resolveBarberName(id: string): string {
     const found = barbers.find((b) => b.id === id);
@@ -95,12 +98,10 @@ export function SalesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Nueva venta</h1>
-        <p className="text-sm text-muted-foreground">
-          Agrega los servicios y productos de esta venta.
-        </p>
-      </div>
+      <PageHeader
+        title="Nueva venta"
+        description="Agrega los servicios y productos de esta venta."
+      />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
         <Card>
@@ -108,7 +109,7 @@ export function SalesPage() {
             <CardTitle className="text-base">Catálogo</CardTitle>
           </CardHeader>
           <CardContent>
-            <CatalogPicker onPick={cart.add} />
+            <CatalogPicker onPick={cart.add} cartQuantities={cartQuantities} />
           </CardContent>
         </Card>
 

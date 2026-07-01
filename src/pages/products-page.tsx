@@ -21,6 +21,7 @@ import {
 import { useProducts } from '@/hooks/use-products';
 import { formatCurrency } from '@/lib/format';
 import { ProductFormDialog } from '@/components/catalog/product-form-dialog';
+import { PageHeader } from '@/components/layout/page-header';
 import { cn } from '@/lib/utils';
 
 export function ProductsPage() {
@@ -28,22 +29,20 @@ export function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
-          <p className="text-sm text-muted-foreground">
-            Inventario de productos disponibles para la venta.
-          </p>
-        </div>
-        <ProductFormDialog
-          trigger={
-            <Button>
-              <Plus className="size-4" />
-              Nuevo producto
-            </Button>
-          }
-        />
-      </div>
+      <PageHeader
+        title="Productos"
+        description="Inventario de productos disponibles para la venta."
+        action={
+          <ProductFormDialog
+            trigger={
+              <Button>
+                <Plus className="size-4" />
+                Nuevo producto
+              </Button>
+            }
+          />
+        }
+      />
 
       {isError && (
         <Alert variant="destructive">
