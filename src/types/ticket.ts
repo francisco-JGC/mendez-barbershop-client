@@ -33,7 +33,6 @@ export interface CreateTicketItemInput {
 
 export interface CreateTicketInput {
   barberId?: string;
-  stationId?: string;
   items: CreateTicketItemInput[];
 }
 

@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { Armchair, Banknote, Scissors } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/dashboard/stat-card';
+import { PeriodTabs } from '@/components/dashboard/period-tabs';
 import { PageHeader } from '@/components/layout/page-header';
 import { useBarberDashboard } from '@/hooks/use-barber-dashboard';
 import { useAuth } from '@/hooks/use-auth';
 import { formatCurrency } from '@/lib/format';
 import type { DashboardPeriod } from '@/types/dashboard';
+
+const CUTS_LABEL: Record<DashboardPeriod, string> = {
+  day: 'Cortes hoy',
+  yesterday: 'Cortes ayer',
+  week: 'Cortes esta semana',
+  month: 'Cortes este mes',
+};
 
 export function BarberDashboardPage() {
   const { user } = useAuth();
@@ -20,14 +27,7 @@ export function BarberDashboardPage() {
       <PageHeader
         title={`Hola, ${user?.email.split('@')[0]} 👋`}
         description="Este es tu resumen personal."
-        action={
-          <Tabs value={period} onValueChange={(v) => setPeriod(v as DashboardPeriod)}>
-            <TabsList>
-              <TabsTrigger value="day">Hoy</TabsTrigger>
-              <TabsTrigger value="month">Este mes</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        }
+        action={<PeriodTabs value={period} onChange={setPeriod} />}
       />
 
       {isError && (
@@ -48,7 +48,7 @@ export function BarberDashboardPage() {
       ) : data ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
-            label={period === 'day' ? 'Cortes hoy' : 'Cortes este mes'}
+            label={CUTS_LABEL[period]}
             value={String(data.cutsCount)}
             icon={Scissors}
             accent

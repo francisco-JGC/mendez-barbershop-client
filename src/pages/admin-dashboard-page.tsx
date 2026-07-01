@@ -14,11 +14,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StatCard } from '@/components/dashboard/stat-card';
+import { PeriodTabs } from '@/components/dashboard/period-tabs';
 import { PageHeader } from '@/components/layout/page-header';
 import { useAdminDashboard } from '@/hooks/use-admin-dashboard';
 import { formatCurrency } from '@/lib/format';
@@ -34,14 +34,7 @@ export function AdminDashboardPage() {
       <PageHeader
         title="Dashboard"
         description="Rendimiento general de la barbería."
-        action={
-          <Tabs value={period} onValueChange={(v) => setPeriod(v as DashboardPeriod)}>
-            <TabsList>
-              <TabsTrigger value="day">Hoy</TabsTrigger>
-              <TabsTrigger value="month">Este mes</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        }
+        action={<PeriodTabs value={period} onChange={setPeriod} />}
       />
 
       {isError && (

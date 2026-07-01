@@ -30,7 +30,6 @@ export function SalesPage() {
   const printReceipt = usePrinterStore((s) => s.print);
 
   const [barberId, setBarberId] = useState('');
-  const [stationId, setStationId] = useState('');
   const [lastReceipt, setLastReceipt] = useState<Uint8Array | null>(null);
 
   const barbers = (users ?? []).filter((u) => u.role === Role.BARBER && u.isActive);
@@ -48,6 +47,14 @@ export function SalesPage() {
     return found ? `Silla ${found.number}` : null;
   }
 
+  function stationLabelForBarber(id: string): string | null {
+    const found = (stations ?? []).find((s) => s.currentBarberId === id);
+    return found ? `Silla ${found.number}` : null;
+  }
+
+  const selectedBarberId = isAdmin ? barberId : user?.userId;
+  const stationHint = selectedBarberId ? stationLabelForBarber(selectedBarberId) : null;
+
   async function handlePrint(bytes: Uint8Array) {
     try {
       await printReceipt(bytes);
@@ -61,7 +68,6 @@ export function SalesPage() {
     try {
       const ticket = await createTicketMutation.mutateAsync({
         barberId: isAdmin ? barberId : undefined,
-        stationId: stationId || undefined,
         items: cart.lines.map((l) => ({
           itemType: l.itemType,
           itemId: l.itemId,
@@ -86,7 +92,6 @@ export function SalesPage() {
 
       toast.success(`Venta registrada por ${ticket.total}`);
       cart.clear();
-      setStationId('');
 
       if (usePrinterStore.getState().status === 'connected') {
         await handlePrint(receipt);
@@ -128,9 +133,7 @@ export function SalesPage() {
                 barbers={barbers}
                 barberId={barberId}
                 onBarberChange={setBarberId}
-                stations={stations ?? []}
-                stationId={stationId}
-                onStationChange={setStationId}
+                stationHint={stationHint}
                 onSubmit={handleSubmit}
                 isSubmitting={createTicketMutation.isPending}
               />

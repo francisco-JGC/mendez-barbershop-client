@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCreateUser } from '@/hooks/use-users';
+import { useStations, useAssignBarber } from '@/hooks/use-stations';
 import { getApiErrorMessage } from '@/lib/errors';
 import { Role } from '@/types/auth';
 
@@ -30,23 +31,46 @@ export function UserFormDialog({ trigger }: { trigger: ReactNode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>(Role.BARBER);
+  const [stationId, setStationId] = useState('');
 
   const createMutation = useCreateUser();
+  const assignBarberMutation = useAssignBarber();
+  const { data: stations } = useStations();
+  const availableStations = (stations ?? []).filter((s) => !s.currentBarberId);
+
+  function resetForm() {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setRole(Role.BARBER);
+    setStationId('');
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     try {
-      await createMutation.mutateAsync({ name, email, password, role });
+      const created = await createMutation.mutateAsync({ name, email, password, role });
+
+      if (role === Role.BARBER && stationId) {
+        try {
+          await assignBarberMutation.mutateAsync({ stationId, barberId: created.id });
+        } catch {
+          toast.warning('Usuario creado, pero no se pudo asignar la silla. Asígnala desde Sillas.');
+          setOpen(false);
+          resetForm();
+          return;
+        }
+      }
+
       toast.success('Usuario creado');
       setOpen(false);
-      setName('');
-      setEmail('');
-      setPassword('');
-      setRole(Role.BARBER);
+      resetForm();
     } catch (err) {
       toast.error(getApiErrorMessage(err, 'No se pudo crear el usuario'));
     }
   }
+
+  const isSubmitting = createMutation.isPending || assignBarberMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -96,7 +120,13 @@ export function UserFormDialog({ trigger }: { trigger: ReactNode }) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="user-role">Rol</Label>
-              <Select value={role} onValueChange={(v) => setRole(v as Role)}>
+              <Select
+                value={role}
+                onValueChange={(v) => {
+                  setRole(v as Role);
+                  setStationId('');
+                }}
+              >
                 <SelectTrigger id="user-role" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -106,11 +136,36 @@ export function UserFormDialog({ trigger }: { trigger: ReactNode }) {
                 </SelectContent>
               </Select>
             </div>
+
+            {role === Role.BARBER && (
+              <div className="space-y-2">
+                <Label htmlFor="user-station">Silla</Label>
+                {availableStations.length > 0 ? (
+                  <Select value={stationId} onValueChange={setStationId}>
+                    <SelectTrigger id="user-station" className="w-full">
+                      <SelectValue placeholder="Selecciona una silla" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableStations.map((station) => (
+                        <SelectItem key={station.id} value={station.id}>
+                          Silla {station.number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No hay sillas disponibles. Puedes crear una en "Sillas" y
+                    asignarla después.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <DialogFooter>
-            <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending && <Loader2 className="size-4 animate-spin" />}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
               Crear usuario
             </Button>
           </DialogFooter>

@@ -1,4 +1,4 @@
-import { Loader2, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { Armchair, Loader2, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
@@ -11,7 +11,6 @@ import {
 import { formatCurrency } from '@/lib/format';
 import { lineKey } from '@/lib/ticket-cart';
 import type { CartLine } from '@/types/ticket';
-import type { Station } from '@/types/station';
 import type { UserSummary } from '@/types/user';
 
 export function TicketCart({
@@ -23,9 +22,7 @@ export function TicketCart({
   barbers,
   barberId,
   onBarberChange,
-  stations,
-  stationId,
-  onStationChange,
+  stationHint,
   onSubmit,
   isSubmitting,
 }: {
@@ -37,9 +34,7 @@ export function TicketCart({
   barbers: UserSummary[];
   barberId: string;
   onBarberChange: (value: string) => void;
-  stations: Station[];
-  stationId: string;
-  onStationChange: (value: string) => void;
+  stationHint: string | null;
   onSubmit: () => void;
   isSubmitting: boolean;
 }) {
@@ -128,21 +123,12 @@ export function TicketCart({
           </div>
         )}
 
-        <div className="space-y-1.5">
-          <Label htmlFor="ticket-station">Silla (opcional)</Label>
-          <Select value={stationId} onValueChange={onStationChange}>
-            <SelectTrigger id="ticket-station" className="w-full">
-              <SelectValue placeholder="Sin silla" />
-            </SelectTrigger>
-            <SelectContent>
-              {stations.map((station) => (
-                <SelectItem key={station.id} value={station.id}>
-                  Silla {station.number}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {stationHint && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Armchair className="size-4" />
+            {stationHint}
+          </div>
+        )}
 
         <div className="flex items-center justify-between text-base font-semibold">
           <span>Total</span>

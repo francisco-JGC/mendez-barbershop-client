@@ -1,4 +1,4 @@
-export type DashboardPeriod = 'day' | 'month';
+export type DashboardPeriod = 'day' | 'yesterday' | 'week' | 'month';
 
 export interface BarberRankingEntry {
   barberId: string;
