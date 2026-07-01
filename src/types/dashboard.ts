@@ -4,6 +4,7 @@ export interface BarberRankingEntry {
   barberId: string;
   barberName: string;
   revenue: string;
+  commission: string;
 }
 
 export interface TopServiceEntry {
@@ -23,6 +24,7 @@ export interface AdminDashboardSummary {
   servicesRevenue: string;
   productsRevenue: string;
   totalRevenue: string;
+  totalCommissions: string;
   barberRanking: BarberRankingEntry[];
   topService: TopServiceEntry | null;
   lowStockProducts: LowStockProductEntry[];
@@ -31,5 +33,6 @@ export interface AdminDashboardSummary {
 export interface BarberDashboardSummary {
   cutsCount: number;
   totalRevenue: string;
+  commission: string;
   stationNumber: number | null;
 }

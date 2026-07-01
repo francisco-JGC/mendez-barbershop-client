@@ -22,7 +22,7 @@ import { useUsers } from '@/hooks/use-users';
 import { useStations } from '@/hooks/use-stations';
 import { useServices } from '@/hooks/use-services';
 import { useProducts } from '@/hooks/use-products';
-import { usePrinterStore } from '@/stores/printer-store';
+import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
 import { buildReceipt } from '@/lib/receipt';
 import { formatCurrency, formatDateTime } from '@/lib/format';
 import { BARBERSHOP_DISPLAY_NAME } from '@/lib/constants';
@@ -82,6 +82,7 @@ export function SalesRecordPage() {
           unitPrice: item.unitPrice,
         })),
         total: ticket.total,
+        width: charsPerLine(usePrinterStore.getState().paperWidth),
       });
 
       if (usePrinterStore.getState().status !== 'connected') {

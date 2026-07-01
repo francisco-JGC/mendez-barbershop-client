@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Armchair, Banknote, Scissors } from 'lucide-react';
+import { Armchair, Banknote, HandCoins, Scissors } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/dashboard/stat-card';
@@ -40,13 +40,13 @@ export function BarberDashboardPage() {
       )}
 
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-24 w-full" />
           ))}
         </div>
       ) : data ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label={CUTS_LABEL[period]}
             value={String(data.cutsCount)}
@@ -57,6 +57,12 @@ export function BarberDashboardPage() {
             label="Total generado"
             value={formatCurrency(data.totalRevenue)}
             icon={Banknote}
+          />
+          <StatCard
+            label="Tu ganancia"
+            value={formatCurrency(data.commission)}
+            icon={HandCoins}
+            accent
           />
           <StatCard
             label="Tu silla"

@@ -11,7 +11,7 @@ import { useTicketCart } from '@/hooks/use-ticket-cart';
 import { CatalogPicker } from '@/components/sales/catalog-picker';
 import { TicketCart } from '@/components/sales/ticket-cart';
 import { PrinterStatus } from '@/components/sales/printer-status';
-import { usePrinterStore } from '@/stores/printer-store';
+import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
 import { getApiErrorMessage } from '@/lib/errors';
 import { buildReceipt } from '@/lib/receipt';
 import { lineKey } from '@/lib/ticket-cart';
@@ -76,6 +76,7 @@ export function SalesPage() {
         })),
       });
 
+      const { paperWidth, autoPrint, status } = usePrinterStore.getState();
       const receipt = buildReceipt({
         barbershopName: BARBERSHOP_DISPLAY_NAME,
         ticketId: ticket.id,
@@ -88,13 +89,14 @@ export function SalesPage() {
           unitPrice: l.unitPrice,
         })),
         total: ticket.total,
+        width: charsPerLine(paperWidth),
       });
       setLastReceipt(receipt);
 
       toast.success(`Venta registrada por ${ticket.total}`);
       cart.clear();
 
-      if (usePrinterStore.getState().status === 'connected') {
+      if (autoPrint && status === 'connected') {
         await handlePrint(receipt);
       }
     } catch (err) {

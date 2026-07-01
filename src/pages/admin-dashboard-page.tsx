@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   Banknote,
   Crown,
+  HandCoins,
   Package,
   Scissors,
   TrendingUp,
@@ -50,7 +51,7 @@ export function AdminDashboardPage() {
         <DashboardSkeleton />
       ) : data ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Total recaudado"
               value={formatCurrency(data.totalRevenue)}
@@ -66,6 +67,11 @@ export function AdminDashboardPage() {
               label="Productos"
               value={formatCurrency(data.productsRevenue)}
               icon={Package}
+            />
+            <StatCard
+              label="Comisión de barberos"
+              value={formatCurrency(data.totalCommissions)}
+              icon={HandCoins}
             />
           </div>
 
@@ -105,9 +111,14 @@ export function AdminDashboardPage() {
                             {entry.barberName}
                           </span>
                         </div>
-                        <span className="text-sm font-semibold">
-                          {formatCurrency(entry.revenue)}
-                        </span>
+                        <div className="flex flex-col items-end">
+                          <span className="text-sm font-semibold">
+                            {formatCurrency(entry.revenue)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            Comisión {formatCurrency(entry.commission)}
+                          </span>
+                        </div>
                       </li>
                     ))}
                   </ul>

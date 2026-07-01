@@ -19,7 +19,7 @@ export interface AuthTokens {
 }
 
 export interface LoginPayload {
-  tenantCode: string;
+  tenantCode?: string;
   email: string;
   password: string;
 }

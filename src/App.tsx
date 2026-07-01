@@ -11,7 +11,7 @@ import { SalesPage } from '@/pages/sales-page';
 import { SalesRecordPage } from '@/pages/sales-record-page';
 import { UsersPage } from '@/pages/users-page';
 import { BarberDashboardPage } from '@/pages/barber-dashboard-page';
-import { SuperAdminPlaceholderPage } from '@/pages/super-admin-placeholder-page';
+import { BranchesPage } from '@/pages/branches-page';
 import { Role } from '@/types/auth';
 
 export function App() {
@@ -20,7 +20,9 @@ export function App() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route element={<ProtectedRoute allowedRoles={[Role.SUPER_ADMIN]} />}>
-        <Route path="/super-admin" element={<SuperAdminPlaceholderPage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/super-admin/branches" element={<BranchesPage />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={[Role.ADMIN]} />}>

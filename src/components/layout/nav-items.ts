@@ -1,5 +1,6 @@
 import {
   Armchair,
+  Building2,
   LayoutDashboard,
   Package,
   Receipt,
@@ -29,7 +30,9 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },
   ],
-  [Role.SUPER_ADMIN]: [],
+  [Role.SUPER_ADMIN]: [
+    { label: 'Sucursales', path: '/super-admin/branches', icon: Building2 },
+  ],
 };
 
 export const roleLabels: Record<Role, string> = {
