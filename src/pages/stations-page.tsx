@@ -21,6 +21,13 @@ export function StationsPage() {
   );
   const barberNameById = new Map(barbers.map((b) => [b.id, b.name]));
 
+  const occupiedBarberIds = new Set(
+    (stations ?? [])
+      .map((s) => s.currentBarberId)
+      .filter((id): id is string => !!id),
+  );
+  const availableBarbers = barbers.filter((b) => !occupiedBarberIds.has(b.id));
+
   const occupiedCount = (stations ?? []).filter(
     (s) => s.status === StationStatus.OCCUPIED,
   ).length;
@@ -82,7 +89,7 @@ export function StationsPage() {
               <StationCard
                 key={station.id}
                 station={station}
-                barbers={barbers}
+                barbers={availableBarbers}
                 barberName={
                   station.currentBarberId
                     ? barberNameById.get(station.currentBarberId) ?? 'Barbero'

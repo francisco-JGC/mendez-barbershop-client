@@ -8,6 +8,7 @@ export type Role = (typeof Role)[keyof typeof Role];
 
 export interface AuthenticatedUser {
   userId: string;
+  name: string;
   email: string | null;
   username: string | null;
   role: Role;

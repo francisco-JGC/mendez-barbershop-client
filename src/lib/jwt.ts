@@ -2,6 +2,7 @@ import type { AuthenticatedUser } from '@/types/auth';
 
 interface RawAccessTokenPayload {
   sub: string;
+  name: string;
   email: string | null;
   username: string | null;
   role: AuthenticatedUser['role'];
@@ -17,6 +18,7 @@ export function decodeAccessToken(token: string): AuthenticatedUser {
 
   return {
     userId: payload.sub,
+    name: payload.name,
     email: payload.email,
     username: payload.username,
     role: payload.role,

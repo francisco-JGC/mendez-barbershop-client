@@ -213,6 +213,7 @@ export function UserFormDialog({
                   setRole(v as Role);
                   setStationId('');
                 }}
+                disabled={isEditing}
               >
                 <SelectTrigger id="user-role" className="w-full">
                   <SelectValue />
@@ -222,6 +223,11 @@ export function UserFormDialog({
                   <SelectItem value={Role.ADMIN}>Administrador</SelectItem>
                 </SelectContent>
               </Select>
+              {isEditing && (
+                <p className="text-xs text-muted-foreground">
+                  El rol no se puede cambiar. Crea un nuevo usuario si necesitas otro rol.
+                </p>
+              )}
             </div>
 
             {!isEditing && role === Role.BARBER && (
