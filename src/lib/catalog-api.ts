@@ -43,3 +43,10 @@ export async function updateProduct(
   const { data } = await api.patch<Product>(`/products/${id}`, input);
   return data;
 }
+
+export async function fetchProductByBarcode(barcode: string): Promise<Product> {
+  const { data } = await api.get<Product>(
+    `/products/by-barcode/${encodeURIComponent(barcode)}`,
+  );
+  return data;
+}

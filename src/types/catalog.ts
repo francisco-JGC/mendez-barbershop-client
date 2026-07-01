@@ -12,6 +12,7 @@ export interface Product {
   id: string;
   barbershopId: string;
   name: string;
+  barcode: string | null;
   price: string;
   stock: number;
   lowStockThreshold: number;
@@ -32,6 +33,7 @@ export interface UpdateServiceInput {
 
 export interface CreateProductInput {
   name: string;
+  barcode?: string;
   price: string;
   stock: number;
   lowStockThreshold?: number;
@@ -39,6 +41,7 @@ export interface CreateProductInput {
 
 export interface UpdateProductInput {
   name?: string;
+  barcode?: string | null;
   price?: string;
   stock?: number;
   lowStockThreshold?: number;

@@ -9,6 +9,7 @@ import { useUsers } from '@/hooks/use-users';
 import { useCreateTicket } from '@/hooks/use-create-ticket';
 import { useTicketCart } from '@/hooks/use-ticket-cart';
 import { CatalogPicker } from '@/components/sales/catalog-picker';
+import { BarcodeScannerInput } from '@/components/sales/barcode-scanner-input';
 import { TicketCart } from '@/components/sales/ticket-cart';
 import { PrinterStatus } from '@/components/sales/printer-status';
 import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
@@ -112,14 +113,18 @@ export function SalesPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Catálogo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CatalogPicker onPick={cart.add} cartQuantities={cartQuantities} />
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <BarcodeScannerInput onPick={cart.add} />
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Catálogo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CatalogPicker onPick={cart.add} cartQuantities={cartQuantities} />
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="space-y-4">
           <Card>

@@ -26,6 +26,7 @@ export function ProductFormDialog({
   const isEditing = !!product;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(product?.name ?? '');
+  const [barcode, setBarcode] = useState(product?.barcode ?? '');
   const [price, setPrice] = useState(product?.price ?? '');
   const [stock, setStock] = useState(String(product?.stock ?? 0));
   const [lowStockThreshold, setLowStockThreshold] = useState(
@@ -39,6 +40,7 @@ export function ProductFormDialog({
   useEffect(() => {
     if (open) {
       setName(product?.name ?? '');
+      setBarcode(product?.barcode ?? '');
       setPrice(product?.price ?? '');
       setStock(String(product?.stock ?? 0));
       setLowStockThreshold(String(product?.lowStockThreshold ?? 3));
@@ -47,19 +49,29 @@ export function ProductFormDialog({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const payload = {
-      name,
-      price,
-      stock: Number(stock),
-      lowStockThreshold: Number(lowStockThreshold),
-    };
+    const trimmedBarcode = barcode.trim();
 
     try {
       if (isEditing) {
-        await updateMutation.mutateAsync({ id: product.id, input: payload });
+        await updateMutation.mutateAsync({
+          id: product.id,
+          input: {
+            name,
+            barcode: trimmedBarcode || null,
+            price,
+            stock: Number(stock),
+            lowStockThreshold: Number(lowStockThreshold),
+          },
+        });
         toast.success('Producto actualizado');
       } else {
-        await createMutation.mutateAsync(payload);
+        await createMutation.mutateAsync({
+          name,
+          ...(trimmedBarcode ? { barcode: trimmedBarcode } : {}),
+          price,
+          stock: Number(stock),
+          lowStockThreshold: Number(lowStockThreshold),
+        });
         toast.success('Producto creado');
       }
       setOpen(false);
@@ -94,6 +106,20 @@ export function ProductFormDialog({
                 onChange={(e) => setName(e.target.value)}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="product-barcode">Código de barras</Label>
+              <Input
+                id="product-barcode"
+                placeholder="Escanea o escribe el código (opcional)"
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                maxLength={64}
+                pattern="[A-Za-z0-9\-]*"
+              />
+              <p className="text-xs text-muted-foreground">
+                Permite agregar este producto a la venta con un lector de código de barras.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
