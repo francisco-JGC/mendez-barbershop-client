@@ -8,7 +8,8 @@ export type Role = (typeof Role)[keyof typeof Role];
 
 export interface AuthenticatedUser {
   userId: string;
-  email: string;
+  email: string | null;
+  username: string | null;
   role: Role;
   barbershopId: string | null;
 }
@@ -20,6 +21,6 @@ export interface AuthTokens {
 
 export interface LoginPayload {
   tenantCode?: string;
-  email: string;
+  identifier: string;
   password: string;
 }

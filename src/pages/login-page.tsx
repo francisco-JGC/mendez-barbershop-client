@@ -26,7 +26,7 @@ export function LoginPage() {
 
   const [asPlatform, setAsPlatform] = useState(false);
   const [tenantCode, setTenantCode] = useState(tenantStorage.get() ?? '');
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
 
   if (user) {
@@ -38,7 +38,7 @@ export function LoginPage() {
     loginMutation.mutate(
       {
         tenantCode: asPlatform ? undefined : tenantCode.trim().toLowerCase(),
-        email,
+        identifier: identifier.trim(),
         password,
       },
       {
@@ -88,14 +88,16 @@ export function LoginPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email">Correo</Label>
+                <Label htmlFor="identifier">
+                  {asPlatform ? 'Correo' : 'Correo o usuario'}
+                </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="tu@barberia.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="identifier"
+                  type="text"
+                  autoComplete="username"
+                  placeholder={asPlatform ? 'admin@plataforma.com' : 'tu@barberia.com o usuario'}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
                 />
               </div>

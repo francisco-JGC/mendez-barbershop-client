@@ -106,7 +106,7 @@ export function UsersPage() {
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      {user.email}
+                      {user.email ?? user.username ?? '—'}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">{ROLE_LABEL[user.role] ?? user.role}</Badge>

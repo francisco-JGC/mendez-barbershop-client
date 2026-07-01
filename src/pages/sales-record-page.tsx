@@ -52,7 +52,7 @@ export function SalesRecordPage() {
     if (!barberId) return 'Sin barbero';
     const found = (users ?? []).find((u) => u.id === barberId);
     if (found) return found.name;
-    if (user?.userId === barberId) return user.email;
+    if (user?.userId === barberId) return user.email ?? user.username ?? 'Barbero';
     return 'Barbero';
   }
 

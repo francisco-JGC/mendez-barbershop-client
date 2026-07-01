@@ -38,6 +38,7 @@ export function UserFormDialog({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
+  const [username, setUsername] = useState(user?.username ?? '');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [role, setRole] = useState<Role>(user?.role ?? Role.BARBER);
@@ -53,6 +54,7 @@ export function UserFormDialog({
     if (open) {
       setName(user?.name ?? '');
       setEmail(user?.email ?? '');
+      setUsername(user?.username ?? '');
       setPassword('');
       setPasswordVisible(false);
       setRole(user?.role ?? Role.BARBER);
@@ -68,14 +70,27 @@ export function UserFormDialog({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     try {
+      const identityFields =
+        role === Role.BARBER
+          ? { username: username.trim().toLowerCase() }
+          : { email: email.trim() };
+
       if (isEditing) {
-        await updateMutation.mutateAsync({ id: user.id, input: { name, email, role } });
+        await updateMutation.mutateAsync({
+          id: user.id,
+          input: { name, role, ...identityFields },
+        });
         toast.success('Usuario actualizado');
         setOpen(false);
         return;
       }
 
-      const created = await createMutation.mutateAsync({ name, email, password, role });
+      const created = await createMutation.mutateAsync({
+        name,
+        password,
+        role,
+        ...identityFields,
+      });
 
       if (role === Role.BARBER && stationId) {
         try {
@@ -124,17 +139,36 @@ export function UserFormDialog({
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="user-email">Correo</Label>
-              <Input
-                id="user-email"
-                type="email"
-                placeholder="carlos@barberia.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+            {role === Role.BARBER ? (
+              <div className="space-y-2">
+                <Label htmlFor="user-username">Nombre de usuario</Label>
+                <Input
+                  id="user-username"
+                  placeholder="carlos.ramirez"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                  required
+                  pattern="[a-z0-9._\-]+"
+                  minLength={3}
+                  maxLength={32}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se usa para iniciar sesión. Sólo minúsculas, números, puntos, guiones y guiones bajos.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="user-email">Correo</Label>
+                <Input
+                  id="user-email"
+                  type="email"
+                  placeholder="carlos@barberia.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            )}
             {!isEditing && (
               <div className="space-y-2">
                 <Label htmlFor="user-password">Contraseña</Label>

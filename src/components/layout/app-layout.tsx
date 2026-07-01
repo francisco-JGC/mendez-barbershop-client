@@ -16,9 +16,10 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { navItemsByRole, roleLabels } from '@/components/layout/nav-items';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
+import { userIdentifier } from '@/lib/format';
 
-function initialsFromEmail(email: string): string {
-  return email.slice(0, 2).toUpperCase();
+function initialsFrom(value: string): string {
+  return value.slice(0, 2).toUpperCase();
 }
 
 export function AppLayout() {
@@ -65,18 +66,18 @@ export function AppLayout() {
               <Button variant="ghost" className="ml-auto flex items-center gap-2 px-2">
                 <Avatar className="size-8 ring-2 ring-primary/20">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {initialsFromEmail(user.email)}
+                    {initialsFrom(userIdentifier(user))}
                   </AvatarFallback>
                 </Avatar>
                 <span className="hidden text-sm font-medium sm:inline">
-                  {user.email}
+                  {userIdentifier(user)}
                 </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.email}</p>
+                  <p className="text-sm font-medium leading-none">{userIdentifier(user)}</p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {roleLabels[user.role]}
                   </p>

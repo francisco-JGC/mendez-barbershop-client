@@ -25,7 +25,7 @@ export function BarberDashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Hola, ${user?.email.split('@')[0]} 👋`}
+        title={`Hola, ${user?.username ?? user?.email?.split('@')[0] ?? ''} 👋`}
         description="Este es tu resumen personal."
         action={<PeriodTabs value={period} onChange={setPeriod} />}
       />

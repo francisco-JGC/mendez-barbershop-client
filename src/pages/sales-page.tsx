@@ -39,7 +39,7 @@ export function SalesPage() {
     if (!id) return null;
     const found = barbers.find((b) => b.id === id);
     if (found) return found.name;
-    if (user?.userId === id) return user.email;
+    if (user?.userId === id) return user.email ?? user.username ?? 'Barbero';
     return 'Barbero';
   }
 

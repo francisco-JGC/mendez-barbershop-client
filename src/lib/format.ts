@@ -13,3 +13,10 @@ export function formatDateTime(iso: string): string {
     timeStyle: 'short',
   });
 }
+
+export function userIdentifier(user: {
+  email: string | null;
+  username: string | null;
+}): string {
+  return user.email ?? user.username ?? '';
+}
