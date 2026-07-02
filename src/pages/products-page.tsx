@@ -1,4 +1,5 @@
 import { AlertTriangle, Package, Pencil, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Card,
   CardContent,
@@ -7,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
@@ -18,7 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useProducts } from '@/hooks/use-products';
+import { useProducts, useUpdateProduct } from '@/hooks/use-products';
+import { getApiErrorMessage } from '@/lib/errors';
 import { formatCurrency } from '@/lib/format';
 import { ProductFormDialog } from '@/components/catalog/product-form-dialog';
 import { PageHeader } from '@/components/layout/page-header';
@@ -26,6 +28,16 @@ import { cn } from '@/lib/utils';
 
 export function ProductsPage() {
   const { data, isLoading, isError } = useProducts();
+  const updateMutation = useUpdateProduct();
+
+  async function handleToggleActive(id: string, isActive: boolean) {
+    try {
+      await updateMutation.mutateAsync({ id, input: { isActive } });
+      toast.success(isActive ? 'Producto activado' : 'Producto desactivado');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'No se pudo actualizar el producto'));
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -77,7 +89,7 @@ export function ProductsPage() {
                   <TableHead>Nombre</TableHead>
                   <TableHead>Precio</TableHead>
                   <TableHead>Stock</TableHead>
-                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-right">Activo</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -85,7 +97,10 @@ export function ProductsPage() {
                 {data.map((product) => {
                   const isLowStock = product.stock <= product.lowStockThreshold;
                   return (
-                    <TableRow key={product.id}>
+                    <TableRow
+                      key={product.id}
+                      className={cn(!product.isActive && 'opacity-60')}
+                    >
                       <TableCell className="font-medium">
                         {product.name}
                       </TableCell>
@@ -101,16 +116,25 @@ export function ProductsPage() {
                           {product.stock}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={product.isActive ? 'secondary' : 'outline'}>
-                          {product.isActive ? 'Activo' : 'Inactivo'}
-                        </Badge>
+                      <TableCell className="text-right">
+                        <Switch
+                          checked={product.isActive}
+                          disabled={updateMutation.isPending}
+                          onCheckedChange={(checked) =>
+                            handleToggleActive(product.id, checked)
+                          }
+                          aria-label={
+                            product.isActive
+                              ? 'Desactivar producto'
+                              : 'Activar producto'
+                          }
+                        />
                       </TableCell>
                       <TableCell className="text-right">
                         <ProductFormDialog
                           product={product}
                           trigger={
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" aria-label="Editar producto">
                               <Pencil className="size-4" />
                             </Button>
                           }

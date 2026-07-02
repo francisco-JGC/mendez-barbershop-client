@@ -29,6 +29,7 @@ export interface CreateServiceInput {
 export interface UpdateServiceInput {
   name?: string;
   price?: string;
+  isActive?: boolean;
 }
 
 export interface CreateProductInput {
@@ -45,4 +46,5 @@ export interface UpdateProductInput {
   price?: string;
   stock?: number;
   lowStockThreshold?: number;
+  isActive?: boolean;
 }
