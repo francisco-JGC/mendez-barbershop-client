@@ -68,6 +68,29 @@ export class ReceiptBuilder {
     return this;
   }
 
+  /**
+   * Emits a raster bitmap using `GS v 0` — the widely supported ESC/POS
+   * command for printing 1-bit images. `widthDots` must be a multiple of 8
+   * (each byte packs 8 horizontal pixels). `bytes` length must equal
+   * (widthDots / 8) * heightDots, with the MSB being the leftmost pixel.
+   */
+  rasterImage(widthDots: number, heightDots: number, bytes: Uint8Array): this {
+    const widthBytes = widthDots / 8;
+    // GS v 0 m xL xH yL yH d1..dk
+    this.bytes.push(
+      GS,
+      0x76,
+      0x30,
+      0x00, // normal size
+      widthBytes & 0xff,
+      (widthBytes >> 8) & 0xff,
+      heightDots & 0xff,
+      (heightDots >> 8) & 0xff,
+    );
+    for (const b of bytes) this.bytes.push(b);
+    return this;
+  }
+
   build(): Uint8Array {
     return new Uint8Array(this.bytes);
   }

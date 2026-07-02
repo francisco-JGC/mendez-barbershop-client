@@ -1,5 +1,6 @@
 import { Align, ReceiptBuilder, twoColumns } from '@/lib/escpos';
 import { formatCurrency, formatDateTime } from '@/lib/format';
+import type { ReceiptBitmap } from '@/lib/receipt-image';
 
 const DEFAULT_WIDTH = 32; // characters per line on a standard 58mm thermal printer
 
@@ -18,14 +19,22 @@ export interface ReceiptInput {
   lines: ReceiptLineItem[];
   total: string;
   footer?: string;
+  logo?: ReceiptBitmap | null;
   width?: number;
 }
 
 export function buildReceipt(input: ReceiptInput): Uint8Array {
   const width = input.width ?? DEFAULT_WIDTH;
 
-  const receipt = new ReceiptBuilder()
-    .align(Align.CENTER)
+  const receipt = new ReceiptBuilder().align(Align.CENTER);
+
+  if (input.logo) {
+    receipt
+      .rasterImage(input.logo.widthDots, input.logo.heightDots, input.logo.bytes)
+      .newline();
+  }
+
+  receipt
     .bold(true)
     .doubleHeight(true)
     .line(input.barbershopName)

@@ -15,6 +15,7 @@ import { PrinterStatus } from '@/components/sales/printer-status';
 import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
 import { getApiErrorMessage } from '@/lib/errors';
 import { buildReceipt } from '@/lib/receipt';
+import { imageToReceiptBitmap } from '@/lib/receipt-image';
 import { lineKey } from '@/lib/ticket-cart';
 import { useSettings } from '@/hooks/use-settings';
 import { useCurrentBarbershop } from '@/hooks/use-current-barbershop';
@@ -81,6 +82,10 @@ export function SalesPage() {
       });
 
       const { paperWidth, autoPrint, status } = usePrinterStore.getState();
+      const maxLogoDots = paperWidth === 80 ? 576 : 384;
+      const logoBitmap = settings?.logo
+        ? await imageToReceiptBitmap(settings.logo, maxLogoDots).catch(() => null)
+        : null;
       const receipt = buildReceipt({
         barbershopName:
           currentBarbershop?.name ?? user?.barbershopName ?? 'Barbería',
@@ -95,6 +100,7 @@ export function SalesPage() {
         })),
         total: ticket.total,
         footer: settings?.receiptFooter,
+        logo: logoBitmap,
         width: charsPerLine(paperWidth),
       });
       setLastReceipt(receipt);
