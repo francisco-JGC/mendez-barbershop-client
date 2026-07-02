@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useSettings, useUpdateSettings } from '@/hooks/use-settings';
 import { getApiErrorMessage } from '@/lib/errors';
@@ -25,12 +26,14 @@ export function ReceiptSettings() {
   const updateMutation = useUpdateSettings();
   const [footer, setFooter] = useState('');
   const [logo, setLogo] = useState<string | null>(null);
+  const [printName, setPrintName] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (data) {
       setFooter(data.receiptFooter);
       setLogo(data.logo);
+      setPrintName(data.printBarbershopName);
     }
   }, [data]);
 
@@ -60,6 +63,7 @@ export function ReceiptSettings() {
       await updateMutation.mutateAsync({
         receiptFooter: footer,
         logo: logo,
+        printBarbershopName: printName,
       });
       toast.success('Ticket actualizado');
     } catch (err) {
@@ -67,7 +71,10 @@ export function ReceiptSettings() {
     }
   }
 
-  const hasChanges = footer !== data?.receiptFooter || logo !== (data?.logo ?? null);
+  const hasChanges =
+    footer !== data?.receiptFooter ||
+    logo !== (data?.logo ?? null) ||
+    printName !== (data?.printBarbershopName ?? true);
 
   if (isLoading) return <Skeleton className="h-64 w-full" />;
 
@@ -123,6 +130,18 @@ export function ReceiptSettings() {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5">
+        <div className="space-y-0.5">
+          <Label htmlFor="print-name" className="cursor-pointer">
+            Imprimir nombre de la barbería
+          </Label>
+          <p className="text-xs text-muted-foreground">
+            Muestra el nombre debajo del logo. Desactívalo si el logo ya lo incluye.
+          </p>
+        </div>
+        <Switch id="print-name" checked={printName} onCheckedChange={setPrintName} />
       </div>
 
       <div className="space-y-2">

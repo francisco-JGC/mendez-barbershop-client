@@ -20,11 +20,13 @@ export interface ReceiptInput {
   total: string;
   footer?: string;
   logo?: ReceiptBitmap | null;
+  printBarbershopName?: boolean;
   width?: number;
 }
 
 export function buildReceipt(input: ReceiptInput): Uint8Array {
   const width = input.width ?? DEFAULT_WIDTH;
+  const showName = input.printBarbershopName ?? true;
 
   const receipt = new ReceiptBuilder().align(Align.CENTER);
 
@@ -34,13 +36,17 @@ export function buildReceipt(input: ReceiptInput): Uint8Array {
       .newline();
   }
 
+  if (showName) {
+    receipt
+      .bold(true)
+      .doubleHeight(true)
+      .line(input.barbershopName)
+      .doubleHeight(false)
+      .bold(false)
+      .newline();
+  }
+
   receipt
-    .bold(true)
-    .doubleHeight(true)
-    .line(input.barbershopName)
-    .doubleHeight(false)
-    .bold(false)
-    .newline()
     .align(Align.LEFT)
     .line(`Ticket: ${input.ticketId.slice(0, 8).toUpperCase()}`)
     .line(`Fecha: ${formatDateTime(input.createdAt)}`);

@@ -125,6 +125,7 @@ export function SalesRecordPage() {
         total: ticket.total,
         footer: settings?.receiptFooter,
         logo: logoBitmap,
+        printBarbershopName: settings?.printBarbershopName ?? true,
         width: charsPerLine(paperWidth),
       });
 

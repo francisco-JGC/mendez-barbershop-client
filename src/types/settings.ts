@@ -3,6 +3,7 @@ export interface Settings {
   commissionRate: string;
   receiptFooter: string;
   logo: string | null;
+  printBarbershopName: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -11,4 +12,5 @@ export interface UpdateSettingsInput {
   commissionRate?: number;
   receiptFooter?: string;
   logo?: string | null;
+  printBarbershopName?: boolean;
 }
