@@ -1,4 +1,5 @@
-import { Building2, Plus } from 'lucide-react';
+import { Building2, ChevronRight, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Card,
@@ -27,6 +28,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { BranchFormDialog } from '@/components/branches/branch-form-dialog';
 
 export function BranchesPage() {
+  const navigate = useNavigate();
   const { data, isLoading, isError } = useBranches();
   const setActiveMutation = useSetBranchActive();
 
@@ -91,11 +93,16 @@ export function BranchesPage() {
                   <TableHead>Creada</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Activa</TableHead>
+                  <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.map((branch) => (
-                  <TableRow key={branch.id}>
+                  <TableRow
+                    key={branch.id}
+                    className="cursor-pointer"
+                    onClick={() => navigate(`/super-admin/branches/${branch.id}`)}
+                  >
                     <TableCell className="font-medium">{branch.name}</TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">
                       {branch.code}
@@ -108,7 +115,10 @@ export function BranchesPage() {
                         {branch.isActive ? 'Activa' : 'Inactiva'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell
+                      className="text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Switch
                         checked={branch.isActive}
                         disabled={setActiveMutation.isPending}
@@ -116,6 +126,9 @@ export function BranchesPage() {
                           handleToggleActive(branch.id, checked)
                         }
                       />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <ChevronRight className="ml-auto size-4 text-muted-foreground/60" />
                     </TableCell>
                   </TableRow>
                 ))}

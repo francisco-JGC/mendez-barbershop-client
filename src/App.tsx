@@ -13,6 +13,7 @@ import { UsersPage } from '@/pages/users-page';
 import { SettingsPage } from '@/pages/settings-page';
 import { BarberDashboardPage } from '@/pages/barber-dashboard-page';
 import { BranchesPage } from '@/pages/branches-page';
+import { BranchDetailPage } from '@/pages/branch-detail-page';
 import { Role } from '@/types/auth';
 
 export function App() {
@@ -23,6 +24,7 @@ export function App() {
       <Route element={<ProtectedRoute allowedRoles={[Role.SUPER_ADMIN]} />}>
         <Route element={<AppLayout />}>
           <Route path="/super-admin/branches" element={<BranchesPage />} />
+          <Route path="/super-admin/branches/:id" element={<BranchDetailPage />} />
         </Route>
       </Route>
 
