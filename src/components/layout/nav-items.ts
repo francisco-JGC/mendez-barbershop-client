@@ -5,6 +5,7 @@ import {
   Package,
   Receipt,
   Scissors,
+  Settings,
   ShoppingCart,
   Users,
   type LucideIcon,
@@ -26,6 +27,7 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
     { label: 'Productos', path: '/admin/products', icon: Package },
     { label: 'Sillas', path: '/admin/stations', icon: Armchair },
     { label: 'Usuarios', path: '/admin/users', icon: Users },
+    { label: 'Configuración', path: '/admin/settings', icon: Settings },
   ],
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },

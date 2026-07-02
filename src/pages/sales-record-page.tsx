@@ -31,10 +31,10 @@ import { useUsers } from '@/hooks/use-users';
 import { useStations } from '@/hooks/use-stations';
 import { useServices } from '@/hooks/use-services';
 import { useProducts } from '@/hooks/use-products';
+import { useSettings } from '@/hooks/use-settings';
 import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
 import { buildReceipt } from '@/lib/receipt';
 import { formatCurrency, formatDateTime } from '@/lib/format';
-import { BARBERSHOP_DISPLAY_NAME } from '@/lib/constants';
 import { Role } from '@/types/auth';
 import { TicketItemType, type Ticket } from '@/types/ticket';
 
@@ -61,6 +61,7 @@ export function SalesRecordPage() {
   const { data: stations } = useStations();
   const { data: services } = useServices();
   const { data: products } = useProducts();
+  const { data: settings } = useSettings();
   const printReceipt = usePrinterStore((s) => s.print);
 
   const barbers = (users ?? []).filter((u) => u.role === Role.BARBER);
@@ -102,7 +103,7 @@ export function SalesRecordPage() {
     setReprintingId(ticket.id);
     try {
       const receipt = buildReceipt({
-        barbershopName: BARBERSHOP_DISPLAY_NAME,
+        barbershopName: user?.barbershopName ?? 'Barbería',
         ticketId: ticket.id,
         createdAt: ticket.createdAt,
         barberName: ticket.barberId ? barberName(ticket.barberId) : null,
@@ -113,6 +114,7 @@ export function SalesRecordPage() {
           unitPrice: item.unitPrice,
         })),
         total: ticket.total,
+        footer: settings?.receiptFooter,
         width: charsPerLine(usePrinterStore.getState().paperWidth),
       });
 

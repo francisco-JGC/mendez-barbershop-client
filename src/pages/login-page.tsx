@@ -15,7 +15,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/use-auth';
 import { useLogin } from '@/hooks/use-login';
 import { getLoginErrorMessage } from '@/lib/errors';
-import { BARBERSHOP_DISPLAY_NAME } from '@/lib/constants';
 import { tenantStorage } from '@/lib/tenant-storage';
 import { roleHomePath } from '@/lib/routes';
 
@@ -55,9 +54,6 @@ export function LoginPage() {
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Scissors className="size-5" />
-          </span>
-          <span className="text-base font-semibold tracking-tight">
-            {BARBERSHOP_DISPLAY_NAME}
           </span>
         </div>
 
@@ -143,7 +139,7 @@ export function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {BARBERSHOP_DISPLAY_NAME}
+          © {new Date().getFullYear()}
         </p>
       </div>
     </div>

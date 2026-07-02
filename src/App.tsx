@@ -10,6 +10,7 @@ import { StationsPage } from '@/pages/stations-page';
 import { SalesPage } from '@/pages/sales-page';
 import { SalesRecordPage } from '@/pages/sales-record-page';
 import { UsersPage } from '@/pages/users-page';
+import { SettingsPage } from '@/pages/settings-page';
 import { BarberDashboardPage } from '@/pages/barber-dashboard-page';
 import { BranchesPage } from '@/pages/branches-page';
 import { Role } from '@/types/auth';
@@ -34,6 +35,7 @@ export function App() {
           <Route path="/admin/sales" element={<SalesPage />} />
           <Route path="/admin/sales-record" element={<SalesRecordPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 

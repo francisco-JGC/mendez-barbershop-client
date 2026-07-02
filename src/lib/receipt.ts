@@ -17,6 +17,7 @@ export interface ReceiptInput {
   stationLabel?: string | null;
   lines: ReceiptLineItem[];
   total: string;
+  footer?: string;
   width?: number;
 }
 
@@ -56,10 +57,16 @@ export function buildReceipt(input: ReceiptInput): Uint8Array {
     .line(twoColumns('TOTAL', formatCurrency(input.total), width))
     .bold(false)
     .newline()
-    .align(Align.CENTER)
-    .line('Gracias por su visita')
-    .newline(3)
-    .cut();
+    .align(Align.CENTER);
+
+  const footer = input.footer?.trim();
+  if (footer) {
+    for (const footerLine of footer.split('\n')) {
+      receipt.line(footerLine);
+    }
+  }
+
+  receipt.newline(3).cut();
 
   return receipt.build();
 }

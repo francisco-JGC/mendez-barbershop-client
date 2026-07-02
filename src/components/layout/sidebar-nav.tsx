@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Scissors } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { BARBERSHOP_DISPLAY_NAME } from '@/lib/constants';
+import { useAuth } from '@/hooks/use-auth';
 import type { NavItem } from '@/components/layout/nav-items';
 
 export function SidebarNav({
@@ -11,14 +11,17 @@ export function SidebarNav({
   items: NavItem[];
   onNavigate?: () => void;
 }) {
+  const { user } = useAuth();
+  const brandName = user?.barbershopName ?? 'Plataforma';
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 border-b border-sidebar-border px-6 py-6">
         <span className="flex size-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
           <Scissors className="size-5" />
         </span>
-        <span className="font-heading text-base tracking-tight">
-          {BARBERSHOP_DISPLAY_NAME}
+        <span className="font-heading text-base tracking-tight truncate">
+          {brandName}
         </span>
       </div>
 

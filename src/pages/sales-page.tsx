@@ -16,7 +16,7 @@ import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
 import { getApiErrorMessage } from '@/lib/errors';
 import { buildReceipt } from '@/lib/receipt';
 import { lineKey } from '@/lib/ticket-cart';
-import { BARBERSHOP_DISPLAY_NAME } from '@/lib/constants';
+import { useSettings } from '@/hooks/use-settings';
 import { PageHeader } from '@/components/layout/page-header';
 import { Role } from '@/types/auth';
 
@@ -29,6 +29,7 @@ export function SalesPage() {
   const createTicketMutation = useCreateTicket();
   const cart = useTicketCart();
   const printReceipt = usePrinterStore((s) => s.print);
+  const { data: settings } = useSettings();
 
   const [barberId, setBarberId] = useState('');
   const [lastReceipt, setLastReceipt] = useState<Uint8Array | null>(null);
@@ -79,7 +80,7 @@ export function SalesPage() {
 
       const { paperWidth, autoPrint, status } = usePrinterStore.getState();
       const receipt = buildReceipt({
-        barbershopName: BARBERSHOP_DISPLAY_NAME,
+        barbershopName: user?.barbershopName ?? 'Barbería',
         ticketId: ticket.id,
         createdAt: ticket.createdAt,
         barberName: resolveBarberName(ticket.barberId),
@@ -90,6 +91,7 @@ export function SalesPage() {
           unitPrice: l.unitPrice,
         })),
         total: ticket.total,
+        footer: settings?.receiptFooter,
         width: charsPerLine(paperWidth),
       });
       setLastReceipt(receipt);
