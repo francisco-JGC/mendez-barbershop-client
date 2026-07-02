@@ -10,11 +10,12 @@ async function fetchCurrentBarbershop(): Promise<Branch> {
   return data;
 }
 
-export function useCurrentBarbershop() {
+export function useCurrentBarbershop(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: CURRENT_BARBERSHOP_KEY,
     queryFn: fetchCurrentBarbershop,
     staleTime: 60_000,
+    enabled: options?.enabled ?? true,
   });
 }
 

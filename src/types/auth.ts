@@ -13,6 +13,7 @@ export interface AuthenticatedUser {
   username: string | null;
   role: Role;
   barbershopId: string | null;
+  barbershopName: string | null;
 }
 
 export interface AuthTokens {

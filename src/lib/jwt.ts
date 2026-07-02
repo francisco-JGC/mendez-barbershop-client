@@ -7,6 +7,7 @@ interface RawAccessTokenPayload {
   username: string | null;
   role: AuthenticatedUser['role'];
   barbershopId: string | null;
+  barbershopName: string | null;
   exp: number;
 }
 
@@ -23,6 +24,7 @@ export function decodeAccessToken(token: string): AuthenticatedUser {
     username: payload.username,
     role: payload.role,
     barbershopId: payload.barbershopId,
+    barbershopName: payload.barbershopName,
   };
 }
 

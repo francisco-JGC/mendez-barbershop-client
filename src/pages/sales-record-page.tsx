@@ -32,6 +32,7 @@ import { useStations } from '@/hooks/use-stations';
 import { useServices } from '@/hooks/use-services';
 import { useProducts } from '@/hooks/use-products';
 import { useSettings } from '@/hooks/use-settings';
+import { useCurrentBarbershop } from '@/hooks/use-current-barbershop';
 import { charsPerLine, usePrinterStore } from '@/stores/printer-store';
 import { buildReceipt } from '@/lib/receipt';
 import { formatCurrency, formatDateTime } from '@/lib/format';
@@ -62,6 +63,7 @@ export function SalesRecordPage() {
   const { data: services } = useServices();
   const { data: products } = useProducts();
   const { data: settings } = useSettings();
+  const { data: currentBarbershop } = useCurrentBarbershop();
   const printReceipt = usePrinterStore((s) => s.print);
 
   const barbers = (users ?? []).filter((u) => u.role === Role.BARBER);
@@ -103,7 +105,8 @@ export function SalesRecordPage() {
     setReprintingId(ticket.id);
     try {
       const receipt = buildReceipt({
-        barbershopName: user?.barbershopName ?? 'Barbería',
+        barbershopName:
+          currentBarbershop?.name ?? user?.barbershopName ?? 'Barbería',
         ticketId: ticket.id,
         createdAt: ticket.createdAt,
         barberName: ticket.barberId ? barberName(ticket.barberId) : null,

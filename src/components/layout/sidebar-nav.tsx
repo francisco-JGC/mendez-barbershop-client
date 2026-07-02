@@ -2,6 +2,8 @@ import { NavLink } from 'react-router-dom';
 import { Scissors } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
+import { useCurrentBarbershop } from '@/hooks/use-current-barbershop';
+import { Role } from '@/types/auth';
 import type { NavItem } from '@/components/layout/nav-items';
 
 export function SidebarNav({
@@ -12,7 +14,14 @@ export function SidebarNav({
   onNavigate?: () => void;
 }) {
   const { user } = useAuth();
-  const brandName = user?.barbershopName ?? 'Plataforma';
+  // Super-admins don't belong to a tenant, so /tenants/current is unavailable
+  // for them — skip the fetch and label the sidebar accordingly.
+  const isTenantUser = user?.role !== Role.SUPER_ADMIN;
+  const { data: currentBarbershop } = useCurrentBarbershop({
+    enabled: isTenantUser,
+  });
+  const brandName =
+    currentBarbershop?.name ?? user?.barbershopName ?? 'Plataforma';
 
   return (
     <div className="flex h-full flex-col">

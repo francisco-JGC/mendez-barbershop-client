@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Camera, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateProduct, useUpdateProduct } from '@/hooks/use-products';
+import { BarcodeCameraDialog } from '@/components/sales/barcode-camera-dialog';
 import type { Product } from '@/types/catalog';
 
 export function ProductFormDialog({
@@ -32,6 +33,7 @@ export function ProductFormDialog({
   const [lowStockThreshold, setLowStockThreshold] = useState(
     String(product?.lowStockThreshold ?? 3),
   );
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
@@ -109,14 +111,25 @@ export function ProductFormDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="product-barcode">Código de barras</Label>
-              <Input
-                id="product-barcode"
-                placeholder="Escanea o escribe el código (opcional)"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
-                maxLength={64}
-                pattern="[A-Za-z0-9\-]*"
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  id="product-barcode"
+                  placeholder="Escanea o escribe el código (opcional)"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                  maxLength={64}
+                  pattern="[A-Za-z0-9\-]*"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Escanear con cámara"
+                  onClick={() => setCameraOpen(true)}
+                >
+                  <Camera className="size-4" />
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground">
                 Permite agregar este producto a la venta con un lector de código de barras.
               </p>
@@ -169,6 +182,12 @@ export function ProductFormDialog({
             </Button>
           </DialogFooter>
         </form>
+
+        <BarcodeCameraDialog
+          open={cameraOpen}
+          onOpenChange={setCameraOpen}
+          onDetected={(code) => setBarcode(code)}
+        />
       </DialogContent>
     </Dialog>
   );
