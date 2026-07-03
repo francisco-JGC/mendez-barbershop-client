@@ -65,7 +65,7 @@ export function SalesRecordPage() {
   const { data: products } = useProducts();
   const { data: settings } = useSettings();
   const { data: currentBarbershop } = useCurrentBarbershop();
-  const printReceipt = usePrinterStore((s) => s.print);
+  const queuePrint = usePrinterStore((s) => s.queuePrint);
 
   const barbers = (users ?? []).filter((u) => u.role === Role.BARBER);
   const filteredBarberName = barberIdParam
@@ -129,13 +129,12 @@ export function SalesRecordPage() {
         width: charsPerLine(paperWidth),
       });
 
-      if (usePrinterStore.getState().status !== 'connected') {
-        toast.error('Conecta la impresora antes de reimprimir.');
-        return;
+      const outcome = await queuePrint(receipt);
+      if (outcome === 'printed') {
+        toast.success('Ticket enviado a la impresora');
+      } else {
+        toast.info('Conecta la impresora para imprimir el ticket');
       }
-
-      await printReceipt(receipt);
-      toast.success('Ticket enviado a la impresora');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'No se pudo reimprimir el ticket');
     } finally {

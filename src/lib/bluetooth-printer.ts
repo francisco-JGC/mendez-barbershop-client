@@ -40,20 +40,10 @@ async function findWritableCharacteristic(
   return null;
 }
 
-export async function connectPrinter(
+async function bindToDevice(
+  device: BluetoothDevice,
   onDisconnected: () => void,
 ): Promise<PrinterConnection> {
-  if (!isBluetoothSupported()) {
-    throw new Error(
-      'Este navegador no soporta Web Bluetooth. Usa Chrome o Edge en escritorio.',
-    );
-  }
-
-  const device = await navigator.bluetooth.requestDevice({
-    acceptAllDevices: true,
-    optionalServices: PRINTER_SERVICE_CANDIDATES,
-  });
-
   device.addEventListener('gattserverdisconnected', onDisconnected);
 
   const server = await device.gatt?.connect();
@@ -75,6 +65,62 @@ export async function connectPrinter(
     useWriteWithoutResponse:
       !characteristic.properties.write && characteristic.properties.writeWithoutResponse,
   };
+}
+
+export async function connectPrinter(
+  onDisconnected: () => void,
+  preferredName?: string | null,
+): Promise<PrinterConnection> {
+  if (!isBluetoothSupported()) {
+    throw new Error(
+      'Este navegador no soporta Web Bluetooth. Usa Chrome en Android.',
+    );
+  }
+
+  // If we already know which printer the user paired last, filter the picker
+  // by exact name so the dialog opens with just that device (one tap to
+  // reconnect). First-time connects fall back to showing everything.
+  const options: RequestDeviceOptions = preferredName
+    ? {
+        filters: [{ name: preferredName }],
+        optionalServices: PRINTER_SERVICE_CANDIDATES,
+      }
+    : {
+        acceptAllDevices: true,
+        optionalServices: PRINTER_SERVICE_CANDIDATES,
+      };
+
+  const device = await navigator.bluetooth.requestDevice(options);
+  return bindToDevice(device, onDisconnected);
+}
+
+/**
+ * Attempts to reconnect to a previously-authorized printer without any user
+ * gesture, using `navigator.bluetooth.getDevices()`. Returns null if the
+ * device is no longer authorized, out of range, or the browser doesn't
+ * support the API — the caller falls back to a manual connect.
+ */
+export async function reconnectPrinter(
+  deviceId: string,
+  onDisconnected: () => void,
+): Promise<PrinterConnection | null> {
+  if (!isBluetoothSupported()) return null;
+  // `getDevices` isn't in every Chrome version — feature-detect before using.
+  const getDevices = (
+    navigator.bluetooth as unknown as {
+      getDevices?: () => Promise<BluetoothDevice[]>;
+    }
+  ).getDevices;
+  if (typeof getDevices !== 'function') return null;
+
+  try {
+    const devices = await getDevices.call(navigator.bluetooth);
+    const device = devices.find((d) => d.id === deviceId);
+    if (!device) return null;
+    return await bindToDevice(device, onDisconnected);
+  } catch {
+    return null;
+  }
 }
 
 export function disconnectPrinter(connection: PrinterConnection): void {

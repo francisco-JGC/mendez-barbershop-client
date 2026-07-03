@@ -24,6 +24,7 @@ export function PrinterSettingsForm() {
   const errorMessage = usePrinterStore((s) => s.errorMessage);
   const paperWidth = usePrinterStore((s) => s.paperWidth);
   const autoPrint = usePrinterStore((s) => s.autoPrint);
+  const lastDeviceName = usePrinterStore((s) => s.lastDeviceName);
   const connect = usePrinterStore((s) => s.connect);
   const disconnect = usePrinterStore((s) => s.disconnect);
   const setPaperWidth = usePrinterStore((s) => s.setPaperWidth);
@@ -74,7 +75,7 @@ export function PrinterSettingsForm() {
             ) : (
               <Bluetooth className="size-3.5" />
             )}
-            Conectar
+            {lastDeviceName ? `Reconectar a ${lastDeviceName}` : 'Conectar'}
           </Button>
         )}
       </div>

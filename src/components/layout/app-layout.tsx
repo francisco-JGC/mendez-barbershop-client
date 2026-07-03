@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { navItemsByRole, roleLabels } from '@/components/layout/nav-items';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
+import { PrinterAutoDialog } from '@/components/sales/printer-auto-dialog';
 import { userIdentifier } from '@/lib/format';
 
 function initialsFrom(value: string): string {
@@ -96,6 +97,8 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <PrinterAutoDialog />
     </div>
   );
 }

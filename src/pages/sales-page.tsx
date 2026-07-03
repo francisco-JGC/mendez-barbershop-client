@@ -30,7 +30,7 @@ export function SalesPage() {
   const { data: users } = useUsers(isAdmin);
   const createTicketMutation = useCreateTicket();
   const cart = useTicketCart();
-  const printReceipt = usePrinterStore((s) => s.print);
+  const queuePrint = usePrinterStore((s) => s.queuePrint);
   const { data: settings } = useSettings();
   const { data: currentBarbershop } = useCurrentBarbershop();
 
@@ -63,8 +63,12 @@ export function SalesPage() {
 
   async function handlePrint(bytes: Uint8Array) {
     try {
-      await printReceipt(bytes);
-      toast.success('Ticket enviado a la impresora');
+      const outcome = await queuePrint(bytes);
+      if (outcome === 'printed') {
+        toast.success('Ticket enviado a la impresora');
+      } else {
+        toast.info('Conecta la impresora para imprimir el ticket');
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'No se pudo imprimir el ticket');
     }
@@ -81,7 +85,7 @@ export function SalesPage() {
         })),
       });
 
-      const { paperWidth, autoPrint, status } = usePrinterStore.getState();
+      const { paperWidth, autoPrint } = usePrinterStore.getState();
       const maxLogoDots = paperWidth === 80 ? 576 : 384;
       const logoBitmap = settings?.logo
         ? await imageToReceiptBitmap(settings.logo, maxLogoDots).catch(() => null)
@@ -109,7 +113,9 @@ export function SalesPage() {
       toast.success(`Venta registrada por ${ticket.total}`);
       cart.clear();
 
-      if (autoPrint && status === 'connected') {
+      if (autoPrint) {
+        // handlePrint (via queuePrint) handles the disconnected case by
+        // queueing the receipt and opening the settings dialog automatically.
         await handlePrint(receipt);
       }
     } catch (err) {
