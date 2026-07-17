@@ -71,7 +71,7 @@ export function UserFormDialog({
     event.preventDefault();
     try {
       const identityFields =
-        role === Role.BARBER
+        role === Role.BARBER || role === Role.SELLER
           ? { username: username.trim().toLowerCase() }
           : { email: email.trim() };
 
@@ -124,7 +124,7 @@ export function UserFormDialog({
             <DialogDescription>
               {isEditing
                 ? 'Actualiza los datos de este miembro del equipo.'
-                : 'Agrega un administrador o barbero a tu equipo.'}
+                : 'Agrega un administrador, barbero o vendedor a tu equipo.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -139,7 +139,7 @@ export function UserFormDialog({
                 required
               />
             </div>
-            {role === Role.BARBER ? (
+            {role === Role.BARBER || role === Role.SELLER ? (
               <div className="space-y-2">
                 <Label htmlFor="user-username">Nombre de usuario</Label>
                 <Input
@@ -221,6 +221,7 @@ export function UserFormDialog({
                 <SelectContent>
                   <SelectItem value={Role.BARBER}>Barbero</SelectItem>
                   <SelectItem value={Role.ADMIN}>Administrador</SelectItem>
+                  <SelectItem value={Role.SELLER}>Vendedor</SelectItem>
                 </SelectContent>
               </Select>
               {isEditing && (

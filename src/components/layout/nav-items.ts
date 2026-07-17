@@ -35,10 +35,13 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
   [Role.SUPER_ADMIN]: [
     { label: 'Sucursales', path: '/super-admin/branches', icon: Building2 },
   ],
+  // Sellers use the Flutter POS app, not this web client — no nav items here.
+  [Role.SELLER]: [],
 };
 
 export const roleLabels: Record<Role, string> = {
   [Role.ADMIN]: 'Administrador',
   [Role.BARBER]: 'Barbero',
   [Role.SUPER_ADMIN]: 'Super admin',
+  [Role.SELLER]: 'Vendedor',
 };

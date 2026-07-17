@@ -31,6 +31,7 @@ import { Role } from '@/types/auth';
 const ROLE_LABEL: Record<string, string> = {
   [Role.ADMIN]: 'Administrador',
   [Role.BARBER]: 'Barbero',
+  [Role.SELLER]: 'Vendedor',
 };
 
 export function UsersPage() {
@@ -51,7 +52,7 @@ export function UsersPage() {
     <div className="space-y-6">
       <PageHeader
         title="Usuarios"
-        description="Administradores y barberos de tu barbería."
+        description="Administradores, barberos y vendedores de tu barbería."
         action={
           <UserFormDialog
             trigger={
