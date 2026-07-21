@@ -23,7 +23,7 @@ export function BranchDetailPage() {
     <div className="space-y-6">
       <div>
         <Button asChild variant="ghost" size="sm" className="-ml-2">
-          <Link to="/super-admin/branches">
+          <Link to="/admin/branches">
             <ArrowLeft className="size-4" />
             Volver a sucursales
           </Link>

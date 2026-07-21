@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, Scissors } from 'lucide-react';
+import { Loader2, Scissors } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,64 +15,57 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/use-auth';
 import { useLogin } from '@/hooks/use-login';
 import { getApiErrorMessage, getLoginErrorMessage } from '@/lib/errors';
-import { lookupBarbershop, type BarbershopLookup } from '@/lib/lookup-api';
+import { lookupBarbershop } from '@/lib/lookup-api';
 import { tenantStorage } from '@/lib/tenant-storage';
 import { roleHomePath } from '@/lib/routes';
 
-type LoginStep = 'code' | 'credentials';
-
+// Single form. The seller/barber fills in the branch code + credentials; the
+// admin leaves the code blank because their account isn't tied to any one
+// branch (Escenario A: single admin role, branch-agnostic).
 export function LoginPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const loginMutation = useLogin();
 
-  const [asPlatform, setAsPlatform] = useState(false);
-  const [step, setStep] = useState<LoginStep>('code');
   const [tenantCode, setTenantCode] = useState(tenantStorage.get() ?? '');
-  const [tenant, setTenant] = useState<BarbershopLookup | null>(null);
-  const [lookupLoading, setLookupLoading] = useState(false);
-  const [lookupError, setLookupError] = useState<string | null>(null);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [isValidatingTenant, setIsValidatingTenant] = useState(false);
 
   if (user) {
     return <Navigate to={roleHomePath(user.role)} replace />;
   }
 
-  async function handleCodeSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setLookupError(null);
-    setLookupLoading(true);
-    try {
-      const result = await lookupBarbershop(tenantCode.trim().toLowerCase());
-      if (!result.isActive) {
-        setLookupError('Esta sucursal está inactiva. Contacta al administrador.');
+    setValidationError(null);
+    const trimmedCode = tenantCode.trim().toLowerCase();
+
+    // If a code was provided, validate the branch exists and is active before
+    // attempting login — gives the user a clearer error than a generic 401
+    // when they mistype the code.
+    if (trimmedCode) {
+      setIsValidatingTenant(true);
+      try {
+        const branch = await lookupBarbershop(trimmedCode);
+        if (!branch.isActive) {
+          setValidationError('Esta sucursal está inactiva. Contacta al administrador.');
+          return;
+        }
+      } catch (err) {
+        setValidationError(
+          getApiErrorMessage(err, 'No encontramos esa sucursal. Verifica el código.'),
+        );
         return;
+      } finally {
+        setIsValidatingTenant(false);
       }
-      setTenant(result);
-      setStep('credentials');
-    } catch (err) {
-      setLookupError(
-        getApiErrorMessage(err, 'No encontramos esa sucursal. Verifica el código.'),
-      );
-    } finally {
-      setLookupLoading(false);
     }
-  }
 
-  function handleBack() {
-    setStep('code');
-    setTenant(null);
-    setIdentifier('');
-    setPassword('');
-    loginMutation.reset();
-  }
-
-  function handleCredentialsSubmit(event: FormEvent) {
-    event.preventDefault();
     loginMutation.mutate(
       {
-        tenantCode: asPlatform ? undefined : tenantCode.trim().toLowerCase(),
+        tenantCode: trimmedCode || undefined,
         identifier: identifier.trim(),
         password,
       },
@@ -84,206 +77,98 @@ export function LoginPage() {
     );
   }
 
-  function togglePlatformMode() {
-    setAsPlatform((v) => !v);
-    setStep('code');
-    setTenant(null);
-    setIdentifier('');
-    setPassword('');
-    loginMutation.reset();
-    setLookupError(null);
-  }
+  const isSubmitting = loginMutation.isPending || isValidatingTenant;
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-muted/30 px-4 py-10">
       <div className="w-full max-w-sm space-y-6">
-        {step === 'credentials' && tenant?.logo ? (
-          <div className="flex flex-col items-center gap-3 text-center">
-            <div className="flex size-20 items-center justify-center overflow-hidden rounded-2xl border bg-background shadow-sm">
-              <img
-                src={tenant.logo}
-                alt={tenant.name}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2 text-center">
-            <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <Scissors className="size-5" />
-            </span>
-          </div>
-        )}
-
-        {asPlatform ? (
-          <Card className="border-border/60 shadow-sm">
-            <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-xl">Panel de plataforma</CardTitle>
-              <CardDescription>
-                Ingresa con tu cuenta de super administrador.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="identifier">Correo</Label>
-                  <Input
-                    id="identifier"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="admin@plataforma.com"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {loginMutation.isError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {getLoginErrorMessage(loginMutation.error)}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                  {loginMutation.isPending && (
-                    <Loader2 className="size-4 animate-spin" />
-                  )}
-                  Entrar
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        ) : step === 'code' ? (
-          <Card className="border-border/60 shadow-sm">
-            <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-xl">Buscar sucursal</CardTitle>
-              <CardDescription>
-                Ingresa el código de tu barbería para continuar.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCodeSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="tenant-code">Código de sucursal</Label>
-                  <Input
-                    id="tenant-code"
-                    autoComplete="organization"
-                    placeholder="mendez"
-                    value={tenantCode}
-                    onChange={(e) => setTenantCode(e.target.value.toLowerCase())}
-                    required
-                    pattern="[a-z0-9\-]+"
-                    maxLength={63}
-                    autoFocus
-                  />
-                </div>
-
-                {lookupError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{lookupError}</AlertDescription>
-                  </Alert>
-                )}
-
-                <Button type="submit" className="w-full" disabled={lookupLoading}>
-                  {lookupLoading && <Loader2 className="size-4 animate-spin" />}
-                  Continuar
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="border-border/60 shadow-sm">
-            <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-xl">
-                Bienvenido a {tenant?.name}
-              </CardTitle>
-              <CardDescription>
-                Ingresa tus credenciales para acceder.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="identifier">Correo o usuario</Label>
-                  <Input
-                    id="identifier"
-                    type="text"
-                    autoComplete="username"
-                    placeholder="tu@barberia.com o usuario"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {loginMutation.isError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {getLoginErrorMessage(loginMutation.error)}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                  {loginMutation.isPending && (
-                    <Loader2 className="size-4 animate-spin" />
-                  )}
-                  Entrar
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="w-full"
-                  onClick={handleBack}
-                >
-                  <ArrowLeft className="size-4" />
-                  Cambiar sucursal
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={togglePlatformMode}
-            className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-          >
-            {asPlatform
-              ? 'Volver a iniciar sesión en una sucursal'
-              : 'Iniciar como super admin de plataforma'}
-          </button>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <Scissors className="size-5" />
+          </span>
         </div>
+
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="space-y-1 pb-4">
+            <CardTitle className="text-xl">Iniciar sesión</CardTitle>
+            <CardDescription>
+              Ingresa tus credenciales para acceder al panel.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="tenant-code">
+                  Código de sucursal{' '}
+                  <span className="text-xs font-normal text-muted-foreground">
+                    (opcional)
+                  </span>
+                </Label>
+                <Input
+                  id="tenant-code"
+                  autoComplete="organization"
+                  placeholder="mendez"
+                  value={tenantCode}
+                  onChange={(e) => setTenantCode(e.target.value.toLowerCase())}
+                  pattern="[a-z0-9\-]*"
+                  maxLength={63}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Barberos y vendedores deben ingresarlo. Los administradores
+                  pueden dejarlo vacío.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="identifier">Correo o usuario</Label>
+                <Input
+                  id="identifier"
+                  type="text"
+                  autoComplete="username"
+                  placeholder="tu@barberia.com o usuario"
+                  value={identifier}
+                  // Normalize to lowercase live: identifiers are stored and
+                  // looked up in lowercase, so what you see is what gets
+                  // sent — no more mystery "credentials incorrect" errors.
+                  onChange={(e) => setIdentifier(e.target.value.toLowerCase())}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              {validationError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{validationError}</AlertDescription>
+                </Alert>
+              )}
+
+              {loginMutation.isError && !validationError && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    {getLoginErrorMessage(loginMutation.error)}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+                Entrar
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
         <p className="text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()}

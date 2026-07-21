@@ -21,13 +21,8 @@ export function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-      <Route element={<ProtectedRoute allowedRoles={[Role.SUPER_ADMIN]} />}>
-        <Route element={<AppLayout />}>
-          <Route path="/super-admin/branches" element={<BranchesPage />} />
-          <Route path="/super-admin/branches/:id" element={<BranchDetailPage />} />
-        </Route>
-      </Route>
-
+      {/* Admin panel + branch management — Escenario A: a single admin role
+          that manages every branch via the header switcher. */}
       <Route element={<ProtectedRoute allowedRoles={[Role.ADMIN]} />}>
         <Route element={<AppLayout />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
@@ -38,6 +33,8 @@ export function App() {
           <Route path="/admin/sales-record" element={<SalesRecordPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
+          <Route path="/admin/branches" element={<BranchesPage />} />
+          <Route path="/admin/branches/:id" element={<BranchDetailPage />} />
         </Route>
       </Route>
 

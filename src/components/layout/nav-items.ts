@@ -18,6 +18,9 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
+// Escenario A: a single admin role that manages every branch. The admin sees
+// the full panel and picks which branch to operate on from the header
+// switcher.
 export const navItemsByRole: Record<Role, NavItem[]> = {
   [Role.ADMIN]: [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -28,12 +31,10 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
     { label: 'Sillas', path: '/admin/stations', icon: Armchair },
     { label: 'Usuarios', path: '/admin/users', icon: Users },
     { label: 'Configuración', path: '/admin/settings', icon: Settings },
+    { label: 'Sucursales', path: '/admin/branches', icon: Building2 },
   ],
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },
-  ],
-  [Role.SUPER_ADMIN]: [
-    { label: 'Sucursales', path: '/super-admin/branches', icon: Building2 },
   ],
   // Sellers use the Flutter POS app, not this web client — no nav items here.
   [Role.SELLER]: [],
@@ -42,6 +43,5 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
 export const roleLabels: Record<Role, string> = {
   [Role.ADMIN]: 'Administrador',
   [Role.BARBER]: 'Barbero',
-  [Role.SUPER_ADMIN]: 'Super admin',
   [Role.SELLER]: 'Vendedor',
 };

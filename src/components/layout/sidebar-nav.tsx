@@ -3,7 +3,7 @@ import { Scissors } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useCurrentBarbershop } from '@/hooks/use-current-barbershop';
-import { Role } from '@/types/auth';
+import { tenantStorage } from '@/lib/tenant-storage';
 import type { NavItem } from '@/components/layout/nav-items';
 
 export function SidebarNav({
@@ -14,14 +14,17 @@ export function SidebarNav({
   onNavigate?: () => void;
 }) {
   const { user } = useAuth();
-  // Super-admins don't belong to a tenant, so /tenants/current is unavailable
-  // for them — skip the fetch and label the sidebar accordingly.
-  const isTenantUser = user?.role !== Role.SUPER_ADMIN;
+  // The jefe now works branch-by-branch via the header switcher, so
+  // /tenants/current is available (returns the branch matching the current
+  // X-Tenant-Code). Only skip the fetch if no branch is selected yet — the
+  // switcher auto-selects the first active one on mount, so this window is
+  // small.
+  const hasTenant = Boolean(tenantStorage.get());
   const { data: currentBarbershop } = useCurrentBarbershop({
-    enabled: isTenantUser,
+    enabled: hasTenant,
   });
   const brandName =
-    currentBarbershop?.name ?? user?.barbershopName ?? 'Plataforma';
+    currentBarbershop?.name ?? user?.barbershopName ?? 'Selecciona sucursal';
 
   return (
     <div className="flex h-full flex-col">

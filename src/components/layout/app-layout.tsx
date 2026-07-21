@@ -16,8 +16,10 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { navItemsByRole, roleLabels } from '@/components/layout/nav-items';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
+import { BranchSwitcher } from '@/components/layout/branch-switcher';
 import { PrinterAutoDialog } from '@/components/sales/printer-auto-dialog';
 import { userIdentifier } from '@/lib/format';
+import { Role } from '@/types/auth';
 
 function initialsFrom(value: string): string {
   return value.slice(0, 2).toUpperCase();
@@ -61,6 +63,11 @@ export function AppLayout() {
           <Badge variant="secondary" className="hidden lg:inline-flex">
             {roleLabels[user.role]}
           </Badge>
+
+          {/* Every admin manages all branches (Escenario A) — the switcher
+              is always visible for the admin role. Barbers stay pinned to
+              their own branch so we don't render it for them. */}
+          {user.role === Role.ADMIN && <BranchSwitcher />}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

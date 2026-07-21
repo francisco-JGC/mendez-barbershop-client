@@ -101,7 +101,7 @@ export function BranchesPage() {
                   <TableRow
                     key={branch.id}
                     className="cursor-pointer"
-                    onClick={() => navigate(`/super-admin/branches/${branch.id}`)}
+                    onClick={() => navigate(`/admin/branches/${branch.id}`)}
                   >
                     <TableCell className="font-medium">{branch.name}</TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">
