@@ -13,25 +13,25 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useResetBranchAdminPassword } from '@/hooks/use-branches';
+import { useResetBranchSupervisorPassword } from '@/hooks/use-branches';
 import { generatePassword } from '@/lib/generate-password';
 import { getApiErrorMessage } from '@/lib/errors';
 import type { UserSummary } from '@/types/user';
 
-export function BranchAdminResetPasswordDialog({
+export function BranchSupervisorResetPasswordDialog({
   branchId,
-  admin,
+  supervisor,
   trigger,
 }: {
   branchId: string;
-  admin: UserSummary;
+  supervisor: UserSummary;
   trigger: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const resetMutation = useResetBranchAdminPassword(branchId);
+  const resetMutation = useResetBranchSupervisorPassword(branchId);
 
   useEffect(() => {
     if (open) {
@@ -48,11 +48,13 @@ export function BranchAdminResetPasswordDialog({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     try {
-      await resetMutation.mutateAsync({ userId: admin.id, password });
+      await resetMutation.mutateAsync({ userId: supervisor.id, password });
       toast.success('Contraseña actualizada');
       setOpen(false);
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'No se pudo restablecer la contraseña'));
+      toast.error(
+        getApiErrorMessage(err, 'No se pudo restablecer la contraseña'),
+      );
     }
   }
 
@@ -64,8 +66,9 @@ export function BranchAdminResetPasswordDialog({
           <DialogHeader>
             <DialogTitle>Restablecer contraseña</DialogTitle>
             <DialogDescription>
-              Define una nueva contraseña para <strong>{admin.name}</strong>. Se
-              cerrarán sus sesiones activas.
+              Define una nueva contraseña para{' '}
+              <strong>{supervisor.name}</strong>. Se cerrarán sus sesiones
+              activas.
             </DialogDescription>
           </DialogHeader>
 
@@ -87,12 +90,24 @@ export function BranchAdminResetPasswordDialog({
                   type="button"
                   onClick={() => setPasswordVisible((v) => !v)}
                   className="absolute inset-y-0 right-0 flex items-center px-2.5 text-muted-foreground hover:text-foreground"
-                  aria-label={passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-label={
+                    passwordVisible
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
                 >
-                  {passwordVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  {passwordVisible ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
                 </button>
               </div>
-              <Button type="button" variant="outline" onClick={handleGeneratePassword}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGeneratePassword}
+              >
                 <Wand2 className="size-4" />
                 Generar
               </Button>
@@ -106,7 +121,9 @@ export function BranchAdminResetPasswordDialog({
 
           <DialogFooter>
             <Button type="submit" disabled={resetMutation.isPending}>
-              {resetMutation.isPending && <Loader2 className="size-4 animate-spin" />}
+              {resetMutation.isPending && (
+                <Loader2 className="size-4 animate-spin" />
+              )}
               Actualizar contraseña
             </Button>
           </DialogFooter>

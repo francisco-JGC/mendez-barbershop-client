@@ -12,24 +12,28 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  useBranchAdmins,
-  useSetBranchAdminActive,
+  useBranchSupervisors,
+  useSetBranchSupervisorActive,
 } from '@/hooks/use-branches';
 import { getApiErrorMessage } from '@/lib/errors';
 import { cn } from '@/lib/utils';
-import { BranchAdminFormDialog } from '@/components/branches/branch-admin-form-dialog';
-import { BranchAdminResetPasswordDialog } from '@/components/branches/branch-admin-reset-password-dialog';
+import { BranchSupervisorFormDialog } from '@/components/branches/branch-supervisor-form-dialog';
+import { BranchSupervisorResetPasswordDialog } from '@/components/branches/branch-supervisor-reset-password-dialog';
 
-export function BranchAdminsTable({ branchId }: { branchId: string }) {
-  const { data, isLoading } = useBranchAdmins(branchId);
-  const setActiveMutation = useSetBranchAdminActive(branchId);
+export function BranchSupervisorsTable({ branchId }: { branchId: string }) {
+  const { data, isLoading } = useBranchSupervisors(branchId);
+  const setActiveMutation = useSetBranchSupervisorActive(branchId);
 
   async function handleToggleActive(userId: string, isActive: boolean) {
     try {
       await setActiveMutation.mutateAsync({ userId, isActive });
-      toast.success(isActive ? 'Administrador activado' : 'Administrador desactivado');
+      toast.success(
+        isActive ? 'Supervisor activado' : 'Supervisor desactivado',
+      );
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'No se pudo actualizar el administrador'));
+      toast.error(
+        getApiErrorMessage(err, 'No se pudo actualizar el supervisor'),
+      );
     }
   }
 
@@ -46,12 +50,12 @@ export function BranchAdminsTable({ branchId }: { branchId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <BranchAdminFormDialog
+        <BranchSupervisorFormDialog
           branchId={branchId}
           trigger={
             <Button size="sm">
               <Plus className="size-4" />
-              Nuevo administrador
+              Nuevo supervisor
             </Button>
           }
         />
@@ -62,49 +66,53 @@ export function BranchAdminsTable({ branchId }: { branchId: string }) {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead>Correo</TableHead>
+              <TableHead>Usuario</TableHead>
               <TableHead className="text-right">Activo</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((admin) => (
+            {data.map((supervisor) => (
               <TableRow
-                key={admin.id}
-                className={cn(!admin.isActive && 'opacity-60')}
+                key={supervisor.id}
+                className={cn(!supervisor.isActive && 'opacity-60')}
               >
-                <TableCell className="font-medium">{admin.name}</TableCell>
+                <TableCell className="font-medium">{supervisor.name}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {admin.email ?? '—'}
+                  {supervisor.username ?? '—'}
                 </TableCell>
                 <TableCell className="text-right">
                   <Switch
-                    checked={admin.isActive}
+                    checked={supervisor.isActive}
                     disabled={setActiveMutation.isPending}
                     onCheckedChange={(checked) =>
-                      handleToggleActive(admin.id, checked)
+                      handleToggleActive(supervisor.id, checked)
                     }
                     aria-label={
-                      admin.isActive
-                        ? 'Desactivar administrador'
-                        : 'Activar administrador'
+                      supervisor.isActive
+                        ? 'Desactivar supervisor'
+                        : 'Activar supervisor'
                     }
                   />
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
-                    <BranchAdminFormDialog
+                    <BranchSupervisorFormDialog
                       branchId={branchId}
-                      admin={admin}
+                      supervisor={supervisor}
                       trigger={
-                        <Button variant="ghost" size="icon" aria-label="Editar administrador">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Editar supervisor"
+                        >
                           <Pencil className="size-4" />
                         </Button>
                       }
                     />
-                    <BranchAdminResetPasswordDialog
+                    <BranchSupervisorResetPasswordDialog
                       branchId={branchId}
-                      admin={admin}
+                      supervisor={supervisor}
                       trigger={
                         <Button
                           variant="ghost"
@@ -127,8 +135,8 @@ export function BranchAdminsTable({ branchId }: { branchId: string }) {
             <UsersIcon className="size-5" />
           </span>
           <p className="text-sm text-muted-foreground">
-            Esta sucursal no tiene administradores. Crea el primero con el botón de
-            arriba.
+            Esta sucursal no tiene supervisores. Crea el primero con el botón
+            de arriba.
           </p>
         </div>
       )}

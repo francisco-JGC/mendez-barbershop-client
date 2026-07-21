@@ -1,25 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createBranch,
-  createBranchAdmin,
+  createBranchSupervisor,
   fetchBranch,
-  fetchBranchAdmins,
+  fetchBranchSupervisors,
   fetchBranches,
-  resetBranchAdminPassword,
+  resetBranchSupervisorPassword,
   setBranchActive,
-  setBranchAdminActive,
+  setBranchSupervisorActive,
   updateBranch,
-  updateBranchAdmin,
+  updateBranchSupervisor,
 } from '@/lib/branches-api';
 import type {
-  CreateBranchAdminInput,
+  CreateBranchSupervisorInput,
   CreateBranchInput,
 } from '@/types/branch';
 import type { UpdateUserInput } from '@/types/user';
 
 const BRANCHES_KEY = ['branches'];
 const branchKey = (id: string) => ['branches', id];
-const branchAdminsKey = (id: string) => ['branches', id, 'admins'];
+const branchSupervisorsKey = (id: string) => ['branches', id, 'supervisors'];
 
 export function useBranches() {
   return useQuery({
@@ -69,7 +69,7 @@ export function useSetBranchActive() {
   });
 }
 
-export function useCreateBranchAdmin() {
+export function useCreateBranchSupervisor() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -77,49 +77,70 @@ export function useCreateBranchAdmin() {
       input,
     }: {
       branchId: string;
-      input: CreateBranchAdminInput;
-    }) => createBranchAdmin(branchId, input),
+      input: CreateBranchSupervisorInput;
+    }) => createBranchSupervisor(branchId, input),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({
-        queryKey: branchAdminsKey(variables.branchId),
+        queryKey: branchSupervisorsKey(variables.branchId),
       });
     },
   });
 }
 
-export function useBranchAdmins(branchId: string | undefined) {
+export function useBranchSupervisors(branchId: string | undefined) {
   return useQuery({
-    queryKey: branchId ? branchAdminsKey(branchId) : ['branch-admins', 'noop'],
-    queryFn: () => fetchBranchAdmins(branchId!),
+    queryKey: branchId
+      ? branchSupervisorsKey(branchId)
+      : ['branch-supervisors', 'noop'],
+    queryFn: () => fetchBranchSupervisors(branchId!),
     enabled: !!branchId,
   });
 }
 
-export function useUpdateBranchAdmin(branchId: string) {
+export function useUpdateBranchSupervisor(branchId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, input }: { userId: string; input: UpdateUserInput }) =>
-      updateBranchAdmin(branchId, userId, input),
+    mutationFn: ({
+      userId,
+      input,
+    }: {
+      userId: string;
+      input: UpdateUserInput;
+    }) => updateBranchSupervisor(branchId, userId, input),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: branchAdminsKey(branchId) });
+      void queryClient.invalidateQueries({
+        queryKey: branchSupervisorsKey(branchId),
+      });
     },
   });
 }
 
-export function useSetBranchAdminActive(branchId: string) {
+export function useSetBranchSupervisorActive(branchId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, isActive }: { userId: string; isActive: boolean }) =>
-      setBranchAdminActive(branchId, userId, isActive),
+    mutationFn: ({
+      userId,
+      isActive,
+    }: {
+      userId: string;
+      isActive: boolean;
+    }) => setBranchSupervisorActive(branchId, userId, isActive),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: branchAdminsKey(branchId) });
+      void queryClient.invalidateQueries({
+        queryKey: branchSupervisorsKey(branchId),
+      });
     },
   });
 }
 
-export function useResetBranchAdminPassword(branchId: string) {
+export function useResetBranchSupervisorPassword(branchId: string) {
   return useMutation({
-    mutationFn: ({ userId, password }: { userId: string; password: string }) =>
-      resetBranchAdminPassword(branchId, userId, password),
+    mutationFn: ({
+      userId,
+      password,
+    }: {
+      userId: string;
+      password: string;
+    }) => resetBranchSupervisorPassword(branchId, userId, password),
   });
 }

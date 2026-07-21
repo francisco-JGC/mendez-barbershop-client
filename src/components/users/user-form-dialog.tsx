@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { useCreateUser, useUpdateUser } from '@/hooks/use-users';
 import { useStations, useAssignBarber } from '@/hooks/use-stations';
+import { useAuth } from '@/hooks/use-auth';
 import { generatePassword } from '@/lib/generate-password';
 import { getApiErrorMessage } from '@/lib/errors';
 import { Role } from '@/types/auth';
@@ -35,6 +36,8 @@ export function UserFormDialog({
   trigger: ReactNode;
 }) {
   const isEditing = !!user;
+  const { user: currentUser } = useAuth();
+  const isSupervisor = currentUser?.role === Role.SUPERVISOR;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
@@ -220,8 +223,10 @@ export function UserFormDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={Role.BARBER}>Barbero</SelectItem>
-                  <SelectItem value={Role.ADMIN}>Administrador</SelectItem>
                   <SelectItem value={Role.SELLER}>Vendedor</SelectItem>
+                  {!isSupervisor && (
+                    <SelectItem value={Role.ADMIN}>Administrador</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               {isEditing && (

@@ -12,8 +12,10 @@ export interface CreateBranchInput {
   code: string;
 }
 
-export interface CreateBranchAdminInput {
+// Supervisors log in with username + branch code (same pattern as barbers /
+// sellers), not with an email.
+export interface CreateBranchSupervisorInput {
   name: string;
-  email: string;
+  username: string;
   password: string;
 }

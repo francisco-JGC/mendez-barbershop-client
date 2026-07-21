@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/page-header';
 import { useBranch } from '@/hooks/use-branches';
 import { BranchInfoForm } from '@/components/branches/branch-info-form';
-import { BranchAdminsTable } from '@/components/branches/branch-admins-table';
+import { BranchSupervisorsTable } from '@/components/branches/branch-supervisors-table';
 
 export function BranchDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -70,14 +70,14 @@ export function BranchDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <UsersIcon className="size-4 text-primary" />
-                Administradores
+                Supervisores
               </CardTitle>
               <CardDescription>
-                Usuarios que gestionan el día a día de esta sucursal.
+                Usuarios que supervisan el día a día de esta sucursal.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <BranchAdminsTable branchId={branch.id} />
+              <BranchSupervisorsTable branchId={branch.id} />
             </CardContent>
           </Card>
         </div>

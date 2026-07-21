@@ -14,41 +14,41 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  useCreateBranchAdmin,
-  useUpdateBranchAdmin,
+  useCreateBranchSupervisor,
+  useUpdateBranchSupervisor,
 } from '@/hooks/use-branches';
 import { generatePassword } from '@/lib/generate-password';
 import { getApiErrorMessage } from '@/lib/errors';
 import type { UserSummary } from '@/types/user';
 
-export function BranchAdminFormDialog({
+export function BranchSupervisorFormDialog({
   branchId,
-  admin,
+  supervisor,
   trigger,
 }: {
   branchId: string;
-  admin?: UserSummary;
+  supervisor?: UserSummary;
   trigger: ReactNode;
 }) {
-  const isEditing = !!admin;
+  const isEditing = !!supervisor;
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState(admin?.name ?? '');
-  const [email, setEmail] = useState(admin?.email ?? '');
+  const [name, setName] = useState(supervisor?.name ?? '');
+  const [username, setUsername] = useState(supervisor?.username ?? '');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const createMutation = useCreateBranchAdmin();
-  const updateMutation = useUpdateBranchAdmin(branchId);
+  const createMutation = useCreateBranchSupervisor();
+  const updateMutation = useUpdateBranchSupervisor(branchId);
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   useEffect(() => {
     if (open) {
-      setName(admin?.name ?? '');
-      setEmail(admin?.email ?? '');
+      setName(supervisor?.name ?? '');
+      setUsername(supervisor?.username ?? '');
       setPassword('');
       setPasswordVisible(false);
     }
-  }, [open, admin]);
+  }, [open, supervisor]);
 
   function handleGeneratePassword() {
     setPassword(generatePassword());
@@ -60,16 +60,16 @@ export function BranchAdminFormDialog({
     try {
       if (isEditing) {
         await updateMutation.mutateAsync({
-          userId: admin.id,
-          input: { name, email },
+          userId: supervisor.id,
+          input: { name, username },
         });
-        toast.success('Administrador actualizado');
+        toast.success('Supervisor actualizado');
       } else {
         await createMutation.mutateAsync({
           branchId,
-          input: { name, email, password },
+          input: { name, username, password },
         });
-        toast.success('Administrador creado');
+        toast.success('Supervisor creado');
       }
       setOpen(false);
     } catch (err) {
@@ -77,8 +77,8 @@ export function BranchAdminFormDialog({
         getApiErrorMessage(
           err,
           isEditing
-            ? 'No se pudo actualizar el administrador'
-            : 'No se pudo crear el administrador',
+            ? 'No se pudo actualizar el supervisor'
+            : 'No se pudo crear el supervisor',
         ),
       );
     }
@@ -91,20 +91,20 @@ export function BranchAdminFormDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? 'Editar administrador' : 'Nuevo administrador'}
+              {isEditing ? 'Editar supervisor' : 'Nuevo supervisor'}
             </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? 'Actualiza los datos de este administrador.'
-                : 'Agrega un nuevo administrador para esta sucursal.'}
+                ? 'Actualiza los datos de este supervisor.'
+                : 'Agrega un nuevo supervisor para esta sucursal.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="admin-name">Nombre</Label>
+              <Label htmlFor="supervisor-name">Nombre</Label>
               <Input
-                id="admin-name"
+                id="supervisor-name"
                 placeholder="Carlos Ramírez"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -113,23 +113,29 @@ export function BranchAdminFormDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="admin-email">Correo</Label>
+              <Label htmlFor="supervisor-username">Nombre de usuario</Label>
               <Input
-                id="admin-email"
-                type="email"
-                placeholder="admin@barberia.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="supervisor-username"
+                placeholder="carlos.ramirez"
+                value={username}
+                onChange={(e) => setUsername(e.target.value.toLowerCase())}
                 required
+                minLength={3}
+                maxLength={32}
+                pattern="[a-z0-9._\-]+"
               />
+              <p className="text-xs text-muted-foreground">
+                Se usa junto con el código de sucursal para iniciar sesión.
+                Sólo minúsculas, números, puntos, guiones y guiones bajos.
+              </p>
             </div>
             {!isEditing && (
               <div className="space-y-2">
-                <Label htmlFor="admin-password">Contraseña</Label>
+                <Label htmlFor="supervisor-password">Contraseña</Label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Input
-                      id="admin-password"
+                      id="supervisor-password"
                       type={passwordVisible ? 'text' : 'password'}
                       minLength={8}
                       maxLength={72}
@@ -143,19 +149,31 @@ export function BranchAdminFormDialog({
                       type="button"
                       onClick={() => setPasswordVisible((v) => !v)}
                       className="absolute inset-y-0 right-0 flex items-center px-2.5 text-muted-foreground hover:text-foreground"
-                      aria-label={passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      aria-label={
+                        passwordVisible
+                          ? 'Ocultar contraseña'
+                          : 'Mostrar contraseña'
+                      }
                     >
-                      {passwordVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                      {passwordVisible ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
                     </button>
                   </div>
-                  <Button type="button" variant="outline" onClick={handleGeneratePassword}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGeneratePassword}
+                  >
                     <Wand2 className="size-4" />
                     Generar
                   </Button>
                 </div>
                 {passwordVisible && password && (
                   <p className="text-xs text-muted-foreground">
-                    Compártela con el administrador de forma segura.
+                    Compártela con el supervisor de forma segura.
                   </p>
                 )}
               </div>
@@ -165,7 +183,7 @@ export function BranchAdminFormDialog({
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-              {isEditing ? 'Guardar cambios' : 'Crear administrador'}
+              {isEditing ? 'Guardar cambios' : 'Crear supervisor'}
             </Button>
           </DialogFooter>
         </form>

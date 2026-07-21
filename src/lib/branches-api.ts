@@ -1,8 +1,8 @@
 import { api } from '@/lib/api';
 import type {
   Branch,
-  CreateBranchAdminInput,
   CreateBranchInput,
+  CreateBranchSupervisorInput,
 } from '@/types/branch';
 import type { UpdateUserInput, UserSummary } from '@/types/user';
 
@@ -39,53 +39,57 @@ export async function setBranchActive(
   return data;
 }
 
-export async function createBranchAdmin(
+export async function createBranchSupervisor(
   branchId: string,
-  input: CreateBranchAdminInput,
+  input: CreateBranchSupervisorInput,
 ): Promise<UserSummary> {
   const { data } = await api.post<UserSummary>(
-    `/tenants/${branchId}/admin`,
+    `/tenants/${branchId}/supervisors`,
     input,
   );
   return data;
 }
 
-export async function fetchBranchAdmins(branchId: string): Promise<UserSummary[]> {
-  const { data } = await api.get<UserSummary[]>(`/tenants/${branchId}/admins`);
+export async function fetchBranchSupervisors(
+  branchId: string,
+): Promise<UserSummary[]> {
+  const { data } = await api.get<UserSummary[]>(
+    `/tenants/${branchId}/supervisors`,
+  );
   return data;
 }
 
-export async function updateBranchAdmin(
+export async function updateBranchSupervisor(
   branchId: string,
   userId: string,
   input: UpdateUserInput,
 ): Promise<UserSummary> {
   const { data } = await api.patch<UserSummary>(
-    `/tenants/${branchId}/admins/${userId}`,
+    `/tenants/${branchId}/supervisors/${userId}`,
     input,
   );
   return data;
 }
 
-export async function setBranchAdminActive(
+export async function setBranchSupervisorActive(
   branchId: string,
   userId: string,
   isActive: boolean,
 ): Promise<UserSummary> {
   const { data } = await api.patch<UserSummary>(
-    `/tenants/${branchId}/admins/${userId}/active`,
+    `/tenants/${branchId}/supervisors/${userId}/active`,
     { isActive },
   );
   return data;
 }
 
-export async function resetBranchAdminPassword(
+export async function resetBranchSupervisorPassword(
   branchId: string,
   userId: string,
   password: string,
 ): Promise<UserSummary> {
   const { data } = await api.patch<UserSummary>(
-    `/tenants/${branchId}/admins/${userId}/password`,
+    `/tenants/${branchId}/supervisors/${userId}/password`,
     { password },
   );
   return data;

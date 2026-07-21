@@ -15,11 +15,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { useCreateBranch, useCreateBranchAdmin } from '@/hooks/use-branches';
+import {
+  useCreateBranch,
+  useCreateBranchSupervisor,
+} from '@/hooks/use-branches';
 import { generatePassword } from '@/lib/generate-password';
 import { getApiErrorMessage } from '@/lib/errors';
 
 const CODE_PATTERN = /^[a-z0-9-]+$/;
+const USERNAME_PATTERN = /^[a-z0-9._-]+$/;
 
 export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -27,29 +31,29 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
 
-  const [createAdmin, setCreateAdmin] = useState(true);
-  const [adminName, setAdminName] = useState('');
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
+  const [createSupervisor, setCreateSupervisor] = useState(true);
+  const [supervisorName, setSupervisorName] = useState('');
+  const [supervisorUsername, setSupervisorUsername] = useState('');
+  const [supervisorPassword, setSupervisorPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const createBranchMutation = useCreateBranch();
-  const createAdminMutation = useCreateBranchAdmin();
+  const createSupervisorMutation = useCreateBranchSupervisor();
 
   useEffect(() => {
     if (open) {
       setName('');
       setCode('');
-      setCreateAdmin(true);
-      setAdminName('');
-      setAdminEmail('');
-      setAdminPassword('');
+      setCreateSupervisor(true);
+      setSupervisorName('');
+      setSupervisorUsername('');
+      setSupervisorPassword('');
       setPasswordVisible(false);
     }
   }, [open]);
 
   function handleGeneratePassword() {
-    setAdminPassword(generatePassword());
+    setSupervisorPassword(generatePassword());
     setPasswordVisible(true);
   }
 
@@ -61,23 +65,30 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
       return;
     }
 
+    if (createSupervisor && !USERNAME_PATTERN.test(supervisorUsername)) {
+      toast.error(
+        'El usuario del supervisor solo puede contener minúsculas, números, puntos, guiones y guiones bajos.',
+      );
+      return;
+    }
+
     try {
       const branch = await createBranchMutation.mutateAsync({ name, code });
 
-      if (createAdmin) {
+      if (createSupervisor) {
         try {
-          await createAdminMutation.mutateAsync({
+          await createSupervisorMutation.mutateAsync({
             branchId: branch.id,
             input: {
-              name: adminName,
-              email: adminEmail,
-              password: adminPassword,
+              name: supervisorName,
+              username: supervisorUsername,
+              password: supervisorPassword,
             },
           });
-          toast.success(`Sucursal "${branch.name}" y administrador creados`);
+          toast.success(`Sucursal "${branch.name}" y supervisor creados`);
         } catch (err) {
           toast.warning(
-            `Sucursal creada, pero no se pudo crear el administrador: ${getApiErrorMessage(err, 'error desconocido')}`,
+            `Sucursal creada, pero no se pudo crear el supervisor: ${getApiErrorMessage(err, 'error desconocido')}`,
           );
           setOpen(false);
           return;
@@ -93,7 +104,7 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
   }
 
   const isSubmitting =
-    createBranchMutation.isPending || createAdminMutation.isPending;
+    createBranchMutation.isPending || createSupervisorMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -103,7 +114,7 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
           <DialogHeader>
             <DialogTitle>Nueva sucursal</DialogTitle>
             <DialogDescription>
-              Registra una nueva barbería y, opcionalmente, su primer administrador.
+              Registra una nueva barbería y, opcionalmente, su primer supervisor.
             </DialogDescription>
           </DialogHeader>
 
@@ -132,7 +143,8 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
                 pattern="[a-z0-9\-]+"
               />
               <p className="text-xs text-muted-foreground">
-                Se usa para identificar la sucursal al iniciar sesión. Sólo minúsculas, números y guiones.
+                Se usa para identificar la sucursal al iniciar sesión. Sólo
+                minúsculas, números y guiones.
               </p>
             </div>
 
@@ -140,54 +152,63 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
 
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-0.5">
-                <Label htmlFor="create-admin">Crear administrador ahora</Label>
+                <Label htmlFor="create-supervisor">Crear supervisor ahora</Label>
                 <p className="text-xs text-muted-foreground">
-                  Si lo omites, podrás crearlo después desde la lista de sucursales.
+                  Si lo omites, podrás crearlo después desde la lista de
+                  sucursales.
                 </p>
               </div>
               <Switch
-                id="create-admin"
-                checked={createAdmin}
-                onCheckedChange={setCreateAdmin}
+                id="create-supervisor"
+                checked={createSupervisor}
+                onCheckedChange={setCreateSupervisor}
               />
             </div>
 
-            {createAdmin && (
+            {createSupervisor && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="admin-name">Nombre del administrador</Label>
+                  <Label htmlFor="supervisor-name">Nombre del supervisor</Label>
                   <Input
-                    id="admin-name"
+                    id="supervisor-name"
                     placeholder="Carlos Ramírez"
-                    value={adminName}
-                    onChange={(e) => setAdminName(e.target.value)}
+                    value={supervisorName}
+                    onChange={(e) => setSupervisorName(e.target.value)}
                     required
                     maxLength={120}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="admin-email">Correo</Label>
+                  <Label htmlFor="supervisor-username">Nombre de usuario</Label>
                   <Input
-                    id="admin-email"
-                    type="email"
-                    placeholder="admin@mendez.com"
-                    value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
+                    id="supervisor-username"
+                    placeholder="carlos.ramirez"
+                    value={supervisorUsername}
+                    onChange={(e) =>
+                      setSupervisorUsername(e.target.value.toLowerCase())
+                    }
                     required
+                    minLength={3}
+                    maxLength={32}
+                    pattern="[a-z0-9._\-]+"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Se usa junto al código de sucursal para iniciar sesión.
+                    Sólo minúsculas, números, puntos, guiones y guiones bajos.
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="admin-password">Contraseña</Label>
+                  <Label htmlFor="supervisor-password">Contraseña</Label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Input
-                        id="admin-password"
+                        id="supervisor-password"
                         type={passwordVisible ? 'text' : 'password'}
                         minLength={8}
                         maxLength={72}
                         placeholder="Mínimo 8 caracteres"
-                        value={adminPassword}
-                        onChange={(e) => setAdminPassword(e.target.value)}
+                        value={supervisorPassword}
+                        onChange={(e) => setSupervisorPassword(e.target.value)}
                         required
                         className="pr-9"
                       />
@@ -195,7 +216,11 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
                         type="button"
                         onClick={() => setPasswordVisible((v) => !v)}
                         className="absolute inset-y-0 right-0 flex items-center px-2.5 text-muted-foreground hover:text-foreground"
-                        aria-label={passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        aria-label={
+                          passwordVisible
+                            ? 'Ocultar contraseña'
+                            : 'Mostrar contraseña'
+                        }
                       >
                         {passwordVisible ? (
                           <EyeOff className="size-4" />
@@ -204,14 +229,18 @@ export function BranchFormDialog({ trigger }: { trigger: ReactNode }) {
                         )}
                       </button>
                     </div>
-                    <Button type="button" variant="outline" onClick={handleGeneratePassword}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleGeneratePassword}
+                    >
                       <Wand2 className="size-4" />
                       Generar
                     </Button>
                   </div>
-                  {passwordVisible && adminPassword && (
+                  {passwordVisible && supervisorPassword && (
                     <p className="text-xs text-muted-foreground">
-                      Compártela con el administrador de forma segura.
+                      Compártela con el supervisor de forma segura.
                     </p>
                   )}
                 </div>

@@ -18,21 +18,26 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
-// Escenario A: a single admin role that manages every branch. The admin sees
-// the full panel and picks which branch to operate on from the header
-// switcher.
+// The admin panel shared by admins (multi-branch, via header switcher) and
+// supervisors (single-branch, pinned). Supervisors don't see the "Sucursales"
+// entry because they can't manage branches — that's admin-only.
+const branchPanelNav: NavItem[] = [
+  { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+  { label: 'Nueva venta', path: '/admin/sales', icon: ShoppingCart },
+  { label: 'Registro de ventas', path: '/admin/sales-record', icon: Receipt },
+  { label: 'Servicios', path: '/admin/services', icon: Scissors },
+  { label: 'Productos', path: '/admin/products', icon: Package },
+  { label: 'Sillas', path: '/admin/stations', icon: Armchair },
+  { label: 'Usuarios', path: '/admin/users', icon: Users },
+  { label: 'Configuración', path: '/admin/settings', icon: Settings },
+];
+
 export const navItemsByRole: Record<Role, NavItem[]> = {
   [Role.ADMIN]: [
-    { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-    { label: 'Nueva venta', path: '/admin/sales', icon: ShoppingCart },
-    { label: 'Registro de ventas', path: '/admin/sales-record', icon: Receipt },
-    { label: 'Servicios', path: '/admin/services', icon: Scissors },
-    { label: 'Productos', path: '/admin/products', icon: Package },
-    { label: 'Sillas', path: '/admin/stations', icon: Armchair },
-    { label: 'Usuarios', path: '/admin/users', icon: Users },
-    { label: 'Configuración', path: '/admin/settings', icon: Settings },
+    ...branchPanelNav,
     { label: 'Sucursales', path: '/admin/branches', icon: Building2 },
   ],
+  [Role.SUPERVISOR]: branchPanelNav,
   [Role.BARBER]: [
     { label: 'Mi día', path: '/barber', icon: LayoutDashboard },
   ],
@@ -42,6 +47,7 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
 
 export const roleLabels: Record<Role, string> = {
   [Role.ADMIN]: 'Administrador',
+  [Role.SUPERVISOR]: 'Supervisor',
   [Role.BARBER]: 'Barbero',
   [Role.SELLER]: 'Vendedor',
 };

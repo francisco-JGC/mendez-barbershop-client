@@ -21,9 +21,11 @@ export function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Admin panel + branch management — Escenario A: a single admin role
-          that manages every branch via the header switcher. */}
-      <Route element={<ProtectedRoute allowedRoles={[Role.ADMIN]} />}>
+      {/* Branch panel — admins (multi-branch via header switcher) and
+          supervisors (single-branch) share the same routes. Supervisors are
+          additionally restricted at the endpoint level from crossing into
+          other branches or promoting users. */}
+      <Route element={<ProtectedRoute allowedRoles={[Role.ADMIN, Role.SUPERVISOR]} />}>
         <Route element={<AppLayout />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/services" element={<ServicesPage />} />
@@ -33,6 +35,13 @@ export function App() {
           <Route path="/admin/sales-record" element={<SalesRecordPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Branch management (create / activate / assign supervisors) is
+          admin-only. */}
+      <Route element={<ProtectedRoute allowedRoles={[Role.ADMIN]} />}>
+        <Route element={<AppLayout />}>
           <Route path="/admin/branches" element={<BranchesPage />} />
           <Route path="/admin/branches/:id" element={<BranchDetailPage />} />
         </Route>
