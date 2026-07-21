@@ -47,5 +47,4 @@ export interface CartLine {
   name: string;
   unitPrice: string;
   quantity: number;
-  maxStock?: number;
 }

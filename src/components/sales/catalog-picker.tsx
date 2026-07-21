@@ -96,7 +96,6 @@ export function CatalogPicker({
                       itemId: product.id,
                       name: product.name,
                       unitPrice: product.price,
-                      maxStock: product.stock,
                     })
                   }
                 />
@@ -150,18 +149,18 @@ function CatalogCard({
   quantityInCart: number;
   onAdd: () => void;
 }) {
-  const atStockLimit = stock !== undefined && stock - quantityInCart <= 0;
+  const remaining = stock !== undefined ? stock - quantityInCart : undefined;
+  const isNegative = remaining !== undefined && remaining < 0;
+  const isZero = remaining === 0;
 
   return (
     <button
       type="button"
       onClick={onAdd}
-      disabled={atStockLimit}
       className={cn(
         'relative flex flex-col items-start gap-1 rounded-lg border px-3 py-3 text-left transition-all',
         'hover:border-primary/40 hover:bg-primary/5 active:scale-[0.97]',
         quantityInCart > 0 && 'border-primary/50 bg-primary/5',
-        atStockLimit && 'cursor-not-allowed opacity-50 hover:border-border hover:bg-transparent',
       )}
     >
       {quantityInCart > 0 && (
@@ -171,14 +170,18 @@ function CatalogCard({
       )}
       <span className="text-sm font-medium">{name}</span>
       <span className="font-heading text-base text-primary">{formatCurrency(price)}</span>
-      {stock !== undefined && (
+      {remaining !== undefined && (
         <span
           className={cn(
             'text-xs text-muted-foreground',
-            atStockLimit && 'font-medium text-destructive',
+            (isZero || isNegative) && 'font-medium text-destructive',
           )}
         >
-          {atStockLimit ? 'Sin stock disponible' : `${stock - quantityInCart} disponibles`}
+          {isNegative
+            ? `Stock: ${remaining}`
+            : isZero
+              ? 'Sin stock'
+              : `${remaining} disponibles`}
         </span>
       )}
     </button>

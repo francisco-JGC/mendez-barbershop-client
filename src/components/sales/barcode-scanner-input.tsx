@@ -24,16 +24,11 @@ export function BarcodeScannerInput({
     setLoading(true);
     try {
       const product = await fetchProductByBarcode(code);
-      if (product.stock <= 0) {
-        toast.error(`${product.name} está sin stock.`);
-        return;
-      }
       onPick({
         itemType: TicketItemType.PRODUCT,
         itemId: product.id,
         name: product.name,
         unitPrice: product.price,
-        maxStock: product.stock,
       });
       toast.success(`${product.name} agregado`);
       setValue('');
